@@ -90,7 +90,8 @@ class PWP_Settings {
 		register_setting( 'pwp_settings_email', 'pwp_email_container_bg' );
 		register_setting( 'pwp_settings_email', 'pwp_email_text_color' );
 		register_setting( 'pwp_settings_email', 'pwp_email_accent_color' );
-		register_setting( 'pwp_settings_email', 'pwp_email_font' );
+		register_setting( 'pwp_settings_email', 'pwp_email_font_family' );
+		register_setting( 'pwp_settings_email', 'pwp_email_font_size' );
 		register_setting( 'pwp_settings_email', 'pwp_email_footer' );
 
 		add_settings_field(
@@ -221,7 +222,8 @@ class PWP_Settings {
 		$container_bg = get_option( 'pwp_email_container_bg', '#ffffff' );
 		$text_color = get_option( 'pwp_email_text_color', '#333333' );
 		$accent_color = get_option( 'pwp_email_accent_color', '#0073aa' );
-		$font = get_option( 'pwp_email_font', 'Helvetica, Arial, sans-serif' );
+		$font_family = get_option( 'pwp_email_font_family', 'Helvetica, Arial, sans-serif' );
+		$font_size = get_option( 'pwp_email_font_size', '16' );
 		?>
 		<div style="display:flex; flex-wrap:wrap; gap:20px;">
 			<div>
@@ -241,15 +243,17 @@ class PWP_Settings {
 				<input type="color" name="pwp_email_accent_color" value="<?php echo esc_attr( $accent_color ); ?>">
 			</div>
 		</div>
-		<p style="margin-top:10px;">
-			<label>Font Family</label><br>
-			<select name="pwp_email_font">
-				<option value="Helvetica, Arial, sans-serif" <?php selected( $font, 'Helvetica, Arial, sans-serif' ); ?>>Helvetica, Arial (Clean)</option>
-				<option value="'Segoe UI', Tahoma, Geneva, Verdana, sans-serif" <?php selected( $font, "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif" ); ?>>Segoe UI (Modern Windows)</option>
-				<option value="'Times New Roman', Times, serif" <?php selected( $font, "'Times New Roman', Times, serif" ); ?>>Times New Roman (Classic)</option>
-				<option value="Georgia, serif" <?php selected( $font, "Georgia, serif" ); ?>>Georgia (Elegant)</option>
-			</select>
-		</p>
+		<div style="margin-top:10px; display:flex; gap:20px;">
+			<div style="flex:1;">
+				<label>Font Family Stack</label><br>
+				<input type="text" name="pwp_email_font_family" value="<?php echo esc_attr( $font_family ); ?>" style="width:100%;" placeholder="e.g. Inter, Helvetica, sans-serif">
+				<p class="description">Enter font names separated by commas. Defaults to system fonts if not found.</p>
+			</div>
+			<div style="width:100px;">
+				<label>Font Size (px)</label><br>
+				<input type="number" name="pwp_email_font_size" value="<?php echo esc_attr( $font_size ); ?>" style="width:100%;">
+			</div>
+		</div>
 		<?php
 	}
 

@@ -119,7 +119,8 @@ class PWP_Email_Manager {
         $container_bg = get_option( 'pwp_email_container_bg', '#ffffff' );
         $text_color = get_option( 'pwp_email_text_color', '#333333' );
         $accent_color = get_option( 'pwp_email_accent_color', '#0073aa' );
-        $font_family = get_option( 'pwp_email_font', 'Helvetica, Arial, sans-serif' );
+        $font_family = get_option( 'pwp_email_font_family', 'Helvetica, Arial, sans-serif' );
+        $font_size = get_option( 'pwp_email_font_size', '16' );
         $footer_text = get_option( 'pwp_email_footer', 'Powered by ProWPKit' );
 
         // Replace Line Breaks in Footer
@@ -142,7 +143,7 @@ class PWP_Email_Manager {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo esc_html( $title ); ?></title>
 </head>
-<body style="margin:0; padding:0; background-color:<?php echo esc_attr( $bg_color ); ?>; font-family:<?php echo $font_family; ?>;">
+<body style="margin:0; padding:0; background-color:<?php echo esc_attr( $bg_color ); ?>; font-family:<?php echo esc_attr( $font_family ); ?>;">
     <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color:<?php echo esc_attr( $bg_color ); ?>;">
         <tr>
             <td align="center" style="padding:40px 10px;">
@@ -150,7 +151,7 @@ class PWP_Email_Manager {
                 <!-- Main Card -->
                 <table border="0" cellpadding="0" cellspacing="0" width="600" style="background-color:<?php echo esc_attr( $container_bg ); ?>; border-radius:8px; overflow:hidden; box-shadow:0 4px 10px rgba(0,0,0,0.05); max-width:600px; width:100%;">
                     <tr>
-                        <td align="left" style="padding:40px; color:<?php echo esc_attr( $text_color ); ?>; font-size:16px; line-height:1.6;">
+                        <td align="left" style="padding:40px; color:<?php echo esc_attr( $text_color ); ?>; font-size:<?php echo esc_attr( $font_size ); ?>px; line-height:1.6; font-family:<?php echo esc_attr( $font_family ); ?>;">
                             <?php echo $content; ?>
                         </td>
                     </tr>

@@ -5,75 +5,68 @@ document.addEventListener("DOMContentLoaded", function () {
   const doc =
     previewFrame.contentDocument || previewFrame.contentWindow.document;
 
-  // Inputs to watch
-  const inputs = [
-    "pwp_email_logo",
-    "pwp_email_bg_color",
-    "pwp_email_container_bg",
-    "pwp_email_text_color",
-    "pwp_email_accent_color",
-    "pwp_email_font",
-    "pwp_email_footer",
-    "pwp_email_template_admin",
-    "pwp_email_template_user",
-  ];
+    // Inputs to watch
+    const inputs = [
+        'pwp_email_logo',
+        'pwp_email_bg_color',
+        'pwp_email_container_bg',
+        'pwp_email_text_color',
+        'pwp_email_accent_color',
+        'pwp_email_font_family',
+        'pwp_email_font_size',
+        'pwp_email_footer',
+        'pwp_email_template_admin',
+        'pwp_email_template_user'
+    ];
 
-  let currentMode = "admin"; // 'admin' or 'user'
+    let currentMode = 'admin'; // 'admin' or 'user'
 
-  // Mock Data
-  const mockData = {
-    title: "New Submission",
-    body: '<table border="1" cellpadding="5" cellspacing="0" style="border-collapse:collapse; width:100%;"><tr><td style="background:#f9f9f9; width:30%;"><strong>Name</strong></td><td>John Doe</td></tr><tr><td style="background:#f9f9f9; width:30%;"><strong>Email</strong></td><td>john@example.com</td></tr><tr><td style="background:#f9f9f9; width:30%;"><strong>Message</strong></td><td>This is a test message to preview the email design.</td></tr></table><p><small>Submission ID: 123</small></p>',
-    site_name: "My WordPress Site",
-    form_title: "Contact Form",
-    footer: "Powered by ProWPKit",
-  };
+    // Mock Data
+    const mockData = {
+        title: 'New Submission',
+        body: '<table border="1" cellpadding="5" cellspacing="0" style="border-collapse:collapse; width:100%;"><tr><td style="background:#f9f9f9; width:30%;"><strong>Name</strong></td><td>John Doe</td></tr><tr><td style="background:#f9f9f9; width:30%;"><strong>Email</strong></td><td>john@example.com</td></tr><tr><td style="background:#f9f9f9; width:30%;"><strong>Message</strong></td><td>This is a test message to preview the email design.</td></tr></table><p><small>Submission ID: 123</small></p>',
+        site_name: 'My WordPress Site',
+        form_title: 'Contact Form',
+        footer: 'Powered by ProWPKit'
+    };
 
-  function getVal(name) {
-    const el = document.querySelector(`[name="${name}"]`);
-    return el ? el.value : "";
-  }
-
-  function updatePreview() {
-    // Gather styles
-    const logo = getVal("pwp_email_logo");
-    const bg = getVal("pwp_email_bg_color");
-    const containerBg = getVal("pwp_email_container_bg");
-    const text = getVal("pwp_email_text_color");
-    const font = getVal("pwp_email_font");
-    const footerText = getVal("pwp_email_footer");
-
-    // Logic for Content
-    let rawContent = "";
-    let title = "";
-
-    if (currentMode === "admin") {
-      title = "New Form Submission";
-      let tmpl = getVal("pwp_email_template_admin");
-      if (!tmpl)
-        tmpl =
-          "<h1>New Submission</h1><p>You have received a new form submission:</p>{body}<p><small>{site_name}</small></p>";
-      rawContent = tmpl;
-    } else {
-      title = "Thanks for your submission!";
-      let tmpl = getVal("pwp_email_template_user");
-      if (!tmpl)
-        tmpl =
-          "<h1>Thank you!</h1><p>We have received your submission.</p>{body}<p>Best Regards,<br>{site_name}</p>";
-      rawContent = tmpl;
+    function getVal(name) {
+        const el = document.querySelector(`[name="${name}"]`);
+        return el ? el.value : '';
     }
 
-    // Replacements
-    let content = rawContent
-      .replace(/{body}/g, mockData.body)
-      .replace(/{site_name}/g, mockData.site_name)
-      .replace(/{form_title}/g, mockData.form_title);
+    function updatePreview() {
+        // Gather styles
+        const logo = getVal('pwp_email_logo');
+        const bg = getVal('pwp_email_bg_color');
+        const containerBg = getVal('pwp_email_container_bg');
+        const text = getVal('pwp_email_text_color');
+        const font = getVal('pwp_email_font_family');
+        const fontSize = getVal('pwp_email_font_size') || '16';
+        const footerText = getVal('pwp_email_footer');
 
-    const logoHtml = logo
-      ? `<div style="text-align:center; padding-bottom:20px;"><img src="${logo}" style="max-width:200px; height:auto; border:0;"></div>`
-      : "";
+        // Logic for Content
+        let rawContent = '';
 
-    const html = `
+        if (currentMode === 'admin') {
+            let tmpl = getVal('pwp_email_template_admin');
+            if (!tmpl) tmpl = "<h1>New Submission</h1><p>You have received a new form submission:</p>{body}<p><small>{site_name}</small></p>";
+            rawContent = tmpl;
+        } else {
+            let tmpl = getVal('pwp_email_template_user');
+            if (!tmpl) tmpl = "<h1>Thank you!</h1><p>We have received your submission.</p>{body}<p>Best Regards,<br>{site_name}</p>";
+            rawContent = tmpl;
+        }
+
+        // Replacements
+        let content = rawContent
+            .replace(/{body}/g, mockData.body)
+            .replace(/{site_name}/g, mockData.site_name)
+            .replace(/{form_title}/g, mockData.form_title);
+
+        const logoHtml = logo ? `<div style="text-align:center; padding-bottom:20px;"><img src="${logo}" style="max-width:200px; height:auto; border:0;"></div>` : '';
+
+        const html = `
 <!DOCTYPE html>
 <html>
 <body style="margin:0; padding:0; background-color:${bg}; font-family:${font};">
@@ -83,7 +76,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 ${logoHtml}
                 <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color:${containerBg}; border-radius:8px; overflow:hidden; box-shadow:0 4px 10px rgba(0,0,0,0.05); max-width:600px;">
                     <tr>
-                        <td align="left" style="padding:40px; color:${text}; font-size:16px; line-height:1.6;">
+                        <td align="left" style="padding:40px; color:${text}; font-size:${fontSize}px; line-height:1.6; font-family:${font};">
                             ${content}
                         </td>
                     </tr>
