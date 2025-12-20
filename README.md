@@ -1,15 +1,14 @@
-# ProWPKit Forms
-
-- **Contributors:** prowpkit
-- **Tags:** form, contact, support, upload, captcha, secure
-- **Requires at least:** 6.0
-- **Tested up to:** 6.7
-- **Stable tag:** 1.0.0
-- **License:** GPLv2 or later
+=== ProWPKit Forms ===
+Contributors: prowpkit
+Tags: form, contact, support, upload, captcha, secure
+Requires at least: 6.0
+Tested up to: 6.7
+Stable tag: 1.0.1
+License: GPLv2 or later
 
 A developer-first, secure, and professional form builder for Pro WP Kit.
 
-## Description
+== Description ==
 
 ProWPKit Forms is a robust solution for handling contact forms, support tickets, and file uploads. It allows administrators to build raw HTML forms while handling the backend security, validation, and notification logic automatically.
 
@@ -26,16 +25,25 @@ ProWPKit Forms is a robust solution for handling contact forms, support tickets,
   - **Detail View**: Clear metabox layout for viewing data and replying to users.
 - **Email Notifications**: Customizable Admin and User Confirmation email templates with placeholders.
 
-## Installation
+== Installation ==
 
 1.  Upload the plugin files to the `/wp-content/plugins/ProWPKit Support` directory.
 2.  Activate the plugin through the 'Plugins' screen in WordPress.
 3.  Go to **Pro Forms** to create your first form.
 4.  Use the shortcode `[pwp_form id="123"]` to display the form on any page.
 
-## Changelog
+== Changelog ==
 
-### 1.0.0
+= 1.0.1 =
+
+- **Security Fixes**:
+  - Fixed critical vulnerability in `delete_user_data` to restrict file deletion to the `wp-content/uploads` directory.
+  - Enforced strict MIME type checking for file uploads against an internal whitelist.
+- **Bug Fixes**:
+  - Fixed handling of multi-file uploads (e.g., `<input name="files[]">`).
+  - Improved `$_FILES` array normalization to correctly handle both single and array uploads.
+
+= 1.0.0 =
 
 - **Initial Release**:
   - Added Custom Post Type `pwp_form` logic.
