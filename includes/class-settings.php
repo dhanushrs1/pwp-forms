@@ -38,9 +38,9 @@ class PWP_Settings {
 			'pwp_settings_general' // Page slug: General
 		);
 
-		register_setting( 'pwp_settings_group', 'pwp_captcha_provider' );
-		register_setting( 'pwp_settings_group', 'pwp_turnstile_site_key' );
-		register_setting( 'pwp_settings_group', 'pwp_turnstile_secret_key' );
+		register_setting( 'pwp_settings_general', 'pwp_captcha_provider' );
+		register_setting( 'pwp_settings_general', 'pwp_turnstile_site_key' );
+		register_setting( 'pwp_settings_general', 'pwp_turnstile_secret_key' );
 
 		add_settings_field(
 			'pwp_captcha_provider',
@@ -66,7 +66,7 @@ class PWP_Settings {
 			'pwp_settings_general'
 		);
 
-		register_setting( 'pwp_settings_group', 'pwp_max_upload_size' );
+		register_setting( 'pwp_settings_general', 'pwp_max_upload_size' );
 
 		add_settings_field(
 			'pwp_max_upload_size',
@@ -80,16 +80,23 @@ class PWP_Settings {
 		// Section: Email Templates
 		add_settings_section(
 			'pwp_email_section',
-			'Email Templates',
+			'Email Notification Settings',
 			null,
 			'pwp_settings_email' // Page slug: Email
 		);
 
-		register_setting( 'pwp_settings_group', 'pwp_email_template_admin' );
+		register_setting( 'pwp_settings_email', 'pwp_email_template_admin' );
+		register_setting( 'pwp_settings_email', 'pwp_email_template_user' );
+		register_setting( 'pwp_settings_email', 'pwp_from_name' );
+		register_setting( 'pwp_settings_email', 'pwp_from_email' );
 
-		register_setting( 'pwp_settings_group', 'pwp_email_template_user' );
-		register_setting( 'pwp_settings_group', 'pwp_from_name' );
-		register_setting( 'pwp_settings_group', 'pwp_from_email' );
+		add_settings_field(
+			'pwp_sender_settings',
+			'Sender Settings',
+			[ $this, 'render_sender_settings_field' ],
+			'pwp_settings_email',
+			'pwp_email_section'
+		);
 
 		add_settings_field(
 			'pwp_email_template_admin',
@@ -157,7 +164,7 @@ class PWP_Settings {
 			<strong>From Email:</strong><br>
 			<input type="email" name="pwp_from_email" value="<?php echo esc_attr( $from_email ); ?>" style="width:400px;">
 		</p>
-		<p class="description">Emails will appear to come from this Name and Email address.</p>
+		<p class="description">Emails will appear to come from this Name and Email address. IMPORTANT: Use an email on your domain (e.g., support@<?php echo $_SERVER['HTTP_HOST']; ?>) to prevent Spam.</p>
 		<?php
 	}
 
@@ -211,11 +218,11 @@ class PWP_Settings {
 
 			<form method="post" action="options.php">
 				<?php 
-				settings_fields( 'pwp_settings_group' );
-				
 				if ( $active_tab === 'email' ) {
+					settings_fields( 'pwp_settings_email' );
 					do_settings_sections( 'pwp_settings_email' );
 				} else {
+					settings_fields( 'pwp_settings_general' );
 					do_settings_sections( 'pwp_settings_general' );
 				}
 				

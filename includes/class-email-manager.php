@@ -65,22 +65,27 @@ class PWP_Email_Manager {
 		// Headers
 		$headers = [ 'Content-Type: text/html; charset=UTF-8' ];
 		
-		// Custom From Header
+		// Custom From Header (MUST be from the site domain to avoid Spam)
 		$from_name = get_option( 'pwp_from_name', get_bloginfo( 'name' ) );
 		$from_email = get_option( 'pwp_from_email', get_option( 'admin_email' ) );
+		
+		// Force From header
 		$headers[] = "From: $from_name <$from_email>";
 
+		// A. Admin Email Logic
+		// Reply-To should be the USER (Submitter) so admin can just hit reply
+		$admin_headers = $headers;
 		if ( ! empty( $data['email'] ) && is_email( $data['email'] ) ) {
-			$headers[] = 'Reply-To: ' . sanitize_email( $data['email'] );
+			$admin_headers[] = 'Reply-To: ' . sanitize_email( $data['email'] );
 		}
 
 		// Send Admin Email
 		$admin_emails = explode( ',', $admin_emails_str );
 		foreach ( $admin_emails as $to ) {
-			wp_mail( trim( $to ), $subject, $admin_body, $headers, $files );
+			wp_mail( trim( $to ), $subject, $admin_body, $admin_headers, $files );
 		}
 
-		// 4. Send User Confirmation
+		// B. User Confirmation Logic
 		if ( ! empty( $data['email'] ) && is_email( $data['email'] ) ) {
 			$user_template = get_option( 'pwp_email_template_user', '' );
 			if ( empty( $user_template ) ) {
@@ -96,10 +101,11 @@ class PWP_Email_Manager {
 
 			$user_subject = "Confirmation: $subject";
 			
-			// User email also gets the From header (which is already in $headers)
-			// But we shouldn't send Reply-To: user_email to the user themselves.
-			$user_headers = [ 'Content-Type: text/html; charset=UTF-8' ];
-			$user_headers[] = "From: $from_name <$from_email>";
+			// User email headers:
+			// From: Site Name <support@site.com> (Already in $headers)
+			// Reply-To: Support Email (NOT the user themselves)
+			$user_headers = $headers;
+			$user_headers[] = "Reply-To: $from_email"; // If they reply, it goes to support
 
 			wp_mail( $data['email'], $user_subject, $user_body_html, $user_headers );
 		}
