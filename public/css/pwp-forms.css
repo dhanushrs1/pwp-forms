@@ -1,112 +1,174 @@
-/* ProWPKit Forms CSS */
+/* ProWPKit Forms - Default Styles */
 
-/* Response Messages */
-.pwp-response-message {
-  padding: 10px;
-  margin-top: 15px;
-  border-radius: 4px;
-  font-size: 14px;
-}
-
-.pwp-response-message.pwp-success {
-  background-color: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
-}
-
-.pwp-response-message.pwp-error {
-  background-color: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
-}
-
-/* Restricted Notice */
-.pwp-notice.pwp-restricted {
-  background-color: #fff3cd;
-  color: #856404;
-  padding: 15px;
-  border: 1px solid #ffeeba;
-  border-radius: 4px;
-  text-align: center;
-}
-
-/* Utilities */
-.pwp-form input[readonly] {
-    background-color: #e9ecef;
-    cursor: not-allowed;
-    opacity: 0.8;
-}
-
-/* Default Form Layout */
+/* Container */
 .pwp-form {
     max-width: 100%;
+    margin-bottom: 20px;
+    font-family: inherit; /* Inherit theme font */
 }
 
+.pwp-form * {
+    box-sizing: border-box;
+}
+
+/* Labels */
 .pwp-form label {
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 6px;
     font-weight: 600;
+    color: #333;
     margin-top: 15px;
 }
 
+.pwp-form label:first-child {
+    margin-top: 0;
+}
+
+/* Inputs & Textareas */
 .pwp-form input[type="text"],
 .pwp-form input[type="email"],
+.pwp-form input[type="tel"],
+.pwp-form input[type="url"],
+.pwp-form input[type="password"],
 .pwp-form input[type="number"],
-.pwp-form input[type="file"],
+.pwp-form input[type="search"],
+.pwp-form input[type="date"],
+.pwp-form input[type="time"],
+.pwp-form input[type="datetime-local"],
 .pwp-form textarea,
 .pwp-form select {
     width: 100%;
-    padding: 10px;
+    padding: 10px 12px;
     border: 1px solid #ccc;
     border-radius: 4px;
-    box-sizing: border-box; /* Fix padding issue */
-    display: block;
-    margin-bottom: 10px;
+    background-color: #fff;
+    font-size: 16px; /* Prevents zoom on mobile */
+    line-height: 1.5;
+    transition: border-color 0.2s ease-in-out;
 }
 
-.pwp-form button[type="submit"] {
+.pwp-form input:focus,
+.pwp-form textarea:focus,
+.pwp-form select:focus {
+    border-color: #007cba;
+    outline: none;
+    box-shadow: 0 0 0 1px #007cba;
+}
+
+.pwp-form textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* Color Input */
+.pwp-form input[type="color"] {
+    padding: 0;
+    border: none;
+    background: none;
+    height: 40px;
+    width: 60px;
+    cursor: pointer;
+}
+
+/* Checkboxes & Radios */
+.pwp-form .pwp-checkbox,
+.pwp-form .pwp-radio {
+    display: flex;
+    align-items: center;
+    margin-top: 8px;
+    margin-bottom: 8px;
+    font-weight: normal;
+    cursor: pointer;
+}
+
+.pwp-form input[type="checkbox"],
+.pwp-form input[type="radio"] {
+    width: auto;
+    margin-right: 8px;
+    margin-top: 0;
+    cursor: pointer;
+}
+
+/* File Upload */
+.pwp-form input[type="file"] {
+    padding: 8px;
+    background: #f9f9f9;
+}
+
+/* Submit Button */
+.pwp-form button[type="submit"].pwp-submit,
+.pwp-form .pwp-btn {
     display: inline-block;
-    padding: 10px 20px;
+    padding: 12px 24px;
     background-color: #0073aa;
     color: #fff;
     border: none;
     border-radius: 4px;
     cursor: pointer;
     font-size: 16px;
-    margin-top: 10px;
+    font-weight: 500;
+    text-align: center;
+    transition: background-color 0.2s;
+    margin-top: 20px;
+    width: 100%; /* Mobile first */
 }
 
-.pwp-form button[type="submit"]:hover {
+@media (min-width: 600px) {
+    .pwp-form button[type="submit"].pwp-submit,
+    .pwp-form .pwp-btn {
+        width: auto;
+    }
+}
+
+.pwp-form button[type="submit"]:hover,
+.pwp-form .pwp-btn:hover {
     background-color: #005177;
 }
 
-/* Locked Upload UI */
+/* Notices & Alerts */
+.pwp-response-message {
+    padding: 12px;
+    margin-top: 15px;
+    border-radius: 4px;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.pwp-response-message.pwp-success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.pwp-response-message.pwp-error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* Locked Upload Wrapper */
 .pwp-upload-locked-wrapper {
     position: relative;
     display: block;
-    cursor: pointer; /* To trigger JS click */
+    cursor: not-allowed;
+    opacity: 0.7;
 }
 
 .pwp-upload-locked-wrapper input[type="file"] {
-    opacity: 0.4;
-    pointer-events: none; /* Let clicks pass to wrapper */
-    background-color: #f0f0f1;
+    pointer-events: none;
 }
 
 .pwp-lock-overlay {
     position: absolute;
     top: 50%;
-    left: 10px; /* Adjust based on padding */
-    transform: translateY(-50%);
-    background: rgba(255, 255, 255, 0.9);
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255,255,255,0.9);
     padding: 5px 10px;
-    border: 1px solid #ccc;
+    border: 1px solid #ddd;
     border-radius: 4px;
-    font-size: 13px;
+    font-size: 12px;
+    font-weight: bold;
     color: #555;
-    font-weight: 600;
     pointer-events: none;
-    display: flex;
-    align-items: center;
-    gap: 5px;
 }
