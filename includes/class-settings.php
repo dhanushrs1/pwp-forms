@@ -77,6 +77,46 @@ class PWP_Settings {
 		);
 
 		// --- Email Tab Sections ---
+		// Section: Visual Formatting
+		add_settings_section(
+			'pwp_visual_section',
+			'Visual Formatting',
+			null,
+			'pwp_settings_email'
+		);
+
+		register_setting( 'pwp_settings_email', 'pwp_email_logo' );
+		register_setting( 'pwp_settings_email', 'pwp_email_bg_color' );
+		register_setting( 'pwp_settings_email', 'pwp_email_container_bg' );
+		register_setting( 'pwp_settings_email', 'pwp_email_text_color' );
+		register_setting( 'pwp_settings_email', 'pwp_email_accent_color' );
+		register_setting( 'pwp_settings_email', 'pwp_email_font' );
+		register_setting( 'pwp_settings_email', 'pwp_email_footer' );
+
+		add_settings_field(
+			'pwp_email_logo',
+			'Logo URL',
+			[ $this, 'render_logo_field' ],
+			'pwp_settings_email',
+			'pwp_visual_section'
+		);
+
+		add_settings_field(
+			'pwp_email_styling',
+			'Email Styling',
+			[ $this, 'render_styling_fields' ],
+			'pwp_settings_email',
+			'pwp_visual_section'
+		);
+
+		add_settings_field(
+			'pwp_email_footer',
+			'Footer Text',
+			[ $this, 'render_footer_field' ],
+			'pwp_settings_email',
+			'pwp_visual_section'
+		);
+
 		// Section: Email Templates
 		add_settings_section(
 			'pwp_email_section',
@@ -168,8 +208,58 @@ class PWP_Settings {
 		<?php
 	}
 
+	public function render_logo_field() {
+		$logo = get_option( 'pwp_email_logo', '' );
+		?>
+		<input type="url" name="pwp_email_logo" value="<?php echo esc_attr( $logo ); ?>" style="width:400px;" placeholder="https://example.com/logo.png">
+		<p class="description">Enter the full URL of your logo image. Ensure it is hosted on SSL (https).</p>
+		<?php
+	}
 
+	public function render_styling_fields() {
+		$bg_color = get_option( 'pwp_email_bg_color', '#f4f4f4' );
+		$container_bg = get_option( 'pwp_email_container_bg', '#ffffff' );
+		$text_color = get_option( 'pwp_email_text_color', '#333333' );
+		$accent_color = get_option( 'pwp_email_accent_color', '#0073aa' );
+		$font = get_option( 'pwp_email_font', 'Helvetica, Arial, sans-serif' );
+		?>
+		<div style="display:flex; flex-wrap:wrap; gap:20px;">
+			<div>
+				<label>Background Color</label><br>
+				<input type="color" name="pwp_email_bg_color" value="<?php echo esc_attr( $bg_color ); ?>">
+			</div>
+			<div>
+				<label>Container BG</label><br>
+				<input type="color" name="pwp_email_container_bg" value="<?php echo esc_attr( $container_bg ); ?>">
+			</div>
+			<div>
+				<label>Text Color</label><br>
+				<input type="color" name="pwp_email_text_color" value="<?php echo esc_attr( $text_color ); ?>">
+			</div>
+			<div>
+				<label>Accent Color</label><br>
+				<input type="color" name="pwp_email_accent_color" value="<?php echo esc_attr( $accent_color ); ?>">
+			</div>
+		</div>
+		<p style="margin-top:10px;">
+			<label>Font Family</label><br>
+			<select name="pwp_email_font">
+				<option value="Helvetica, Arial, sans-serif" <?php selected( $font, 'Helvetica, Arial, sans-serif' ); ?>>Helvetica, Arial (Clean)</option>
+				<option value="'Segoe UI', Tahoma, Geneva, Verdana, sans-serif" <?php selected( $font, "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif" ); ?>>Segoe UI (Modern Windows)</option>
+				<option value="'Times New Roman', Times, serif" <?php selected( $font, "'Times New Roman', Times, serif" ); ?>>Times New Roman (Classic)</option>
+				<option value="Georgia, serif" <?php selected( $font, "Georgia, serif" ); ?>>Georgia (Elegant)</option>
+			</select>
+		</p>
+		<?php
+	}
 
+	public function render_footer_field() {
+		$footer = get_option( 'pwp_email_footer', 'Powered by ProWPKit' );
+		?>
+		<textarea name="pwp_email_footer" rows="2" style="width:100%;"><?php echo esc_textarea( $footer ); ?></textarea>
+		<p class="description">Text to verify at the bottom of the email.</p>
+		<?php
+	}
 
 	public function render_admin_template_field() {
 		$content = get_option( 'pwp_email_template_admin', "<h1>New Submission</h1>\n<p>You have received a new form submission:</p>\n{body}\n<p><small>{site_name}</small></p>" );
@@ -210,6 +300,11 @@ class PWP_Settings {
 	 */
 	public function render_page() {
 		$active_tab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'general';
+		
+		// Enqueue Local Assets for Settings Page
+		wp_enqueue_style( 'pwp-admin-settings', plugins_url( '../public/css/pwp-admin-settings.css', __FILE__ ), [], '1.0.0' );
+		wp_enqueue_script( 'pwp-admin-settings', plugins_url( '../public/js/pwp-admin-settings.js', __FILE__ ), [], '1.0.0', true );
+
 		?>
 		<div class="wrap">
 			<h1>ProWPKit Forms Settings</h1>
@@ -219,14 +314,33 @@ class PWP_Settings {
 			<form method="post" action="options.php">
 				<?php 
 				if ( $active_tab === 'email' ) {
+					// 2-Column Layout for Email
 					settings_fields( 'pwp_settings_email' );
-					do_settings_sections( 'pwp_settings_email' );
+					?>
+					<div class="pwp-settings-wrapper">
+						<div class="pwp-settings-panel">
+							<?php do_settings_sections( 'pwp_settings_email' ); ?>
+							<?php submit_button(); ?>
+						</div>
+						
+						<div class="pwp-preview-panel">
+							<div class="pwp-preview-header">
+								<h3>Instant Preview</h3>
+								<div class="pwp-preview-controls">
+									<button id="pwp-preview-mode-admin" class="button active">Admin View</button>
+									<button id="pwp-preview-mode-user" class="button">User View</button>
+								</div>
+							</div>
+							<iframe id="pwp-email-preview-frame"></iframe>
+						</div>
+					</div>
+					<?php
 				} else {
+					// Standard Layout for General
 					settings_fields( 'pwp_settings_general' );
 					do_settings_sections( 'pwp_settings_general' );
+					submit_button(); 
 				}
-				
-				submit_button(); 
 				?>
 			</form>
 		</div>
