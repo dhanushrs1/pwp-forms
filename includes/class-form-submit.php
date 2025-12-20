@@ -92,7 +92,7 @@ class PWP_Form_Submit {
 		$user_email = '';
 		
 		// Parse all POST fields excluding known system fields
-		$exclude = [ 'action', 'security', 'form_id', 'pwp_hp_check' ];
+		$exclude = [ 'action', 'security', 'form_id', 'pwp_hp_check', 'cf-turnstile-response', 'g-recaptcha-response' ];
 		
 		foreach ( $_POST as $key => $value ) {
 			if ( ! in_array( $key, $exclude ) ) {
