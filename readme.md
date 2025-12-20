@@ -48,3 +48,4 @@ ProWPKit Forms is a robust solution for handling contact forms, support tickets,
     *   Added **Visual Date Filter** (Month Picker) and Status Filters for submissions.
     *   Added **Status Management** (New, Read, Replied, Closed).
     *   Enhanced **Search** to support Form ID queries.
+
