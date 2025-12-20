@@ -130,19 +130,71 @@ class PWP_Form_Manager {
 	public function render_html_box( $post ) {
 		$html = get_post_meta( $post->ID, '_pwp_form_html', true );
 		?>
-		<p class="description">Use these buttons to quickly insert fields:</p>
-		<div id="pwp-html-helper-buttons" style="margin-bottom:10px;">
-			<button type="button" class="button" onclick="pwpInsertAtCursor('<label>Name</label>\n<input type=\'text\' name=\'name\' class=\'pwp-input\' required>\n')">Name Input</button>
-			<button type="button" class="button" onclick="pwpInsertAtCursor('<label>Email</label>\n<input type=\'email\' name=\'email\' class=\'pwp-input\' required>\n')">Email Input</button>
-			<button type="button" class="button" onclick="pwpInsertAtCursor('<label>Message</label>\n<textarea name=\'message\' class=\'pwp-textarea\' rows=\'4\' required></textarea>\n')">Textarea</button>
-			<button type="button" class="button" onclick="pwpInsertAtCursor('<label>Upload File</label>\n<input type=\'file\' name=\'attachment\' class=\'pwp-input\'>\n')">File Upload</button>
-			<button type="button" class="button button-primary" onclick="pwpInsertAtCursor('<button type=\'submit\' class=\'pwp-btn\'>Submit Form</button>\n')">Submit Button</button>
+		<style>
+			.pwp-toolbar { background: #fdfdfd; border: 1px solid #ddd; border-bottom: 0; padding: 10px; }
+			.pwp-toolbar-group { margin-bottom: 10px; border-bottom: 1px dashed #eee; padding-bottom: 5px; }
+			.pwp-toolbar-group:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+			.pwp-toolbar-label { font-weight: 600; color: #555; font-size: 12px; margin-right: 10px; display: inline-block; width: 70px; }
+			.pwp-btn-insert { cursor: pointer; border: 1px solid #ccc; background: #fff; padding: 2px 8px; font-size: 12px; border-radius: 3px; margin-right: 4px; margin-bottom: 4px; transition: all 0.2s; }
+			.pwp-btn-insert:hover { background: #f0f0f1; border-color: #999; }
+			.pwp-btn-insert.primary { border-color: #2271b1; color: #2271b1; }
+			.pwp-btn-insert.primary:hover { background: #2271b1; color: #fff; }
+		</style>
+
+		<div class="pwp-toolbar">
+			<!-- Text -->
+			<div class="pwp-toolbar-group">
+				<span class="pwp-toolbar-label">Text</span>
+				<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label>Text</label>\n<input type=\'text\' name=\'field_name\' class=\'pwp-input\'>\n')">Text</button>
+				<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label>Email</label>\n<input type=\'email\' name=\'email\' class=\'pwp-input\'>\n')">Email</button>
+				<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label>Phone</label>\n<input type=\'tel\' name=\'phone\' class=\'pwp-input\'>\n')">Tel</button>
+				<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label>Website</label>\n<input type=\'url\' name=\'website\' class=\'pwp-input\'>\n')">URL</button>
+				<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label>Password</label>\n<input type=\'password\' name=\'password\' class=\'pwp-input\'>\n')">Password</button>
+			</div>
+			<!-- Numbers -->
+			<div class="pwp-toolbar-group">
+				<span class="pwp-toolbar-label">Numbers</span>
+				<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label>Number</label>\n<input type=\'number\' name=\'number\' class=\'pwp-input\'>\n')">Number</button>
+				<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label>Range</label>\n<input type=\'range\' name=\'range\' min=\'0\' max=\'10\' class=\'pwp-input\'>\n')">Range</button>
+			</div>
+			<!-- Date/Time -->
+			<div class="pwp-toolbar-group">
+				<span class="pwp-toolbar-label">Date/Time</span>
+				<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label>Date</label>\n<input type=\'date\' name=\'date\' class=\'pwp-input\'>\n')">Date</button>
+				<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label>Time</label>\n<input type=\'time\' name=\'time\' class=\'pwp-input\'>\n')">Time</button>
+				<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label>DateTime</label>\n<input type=\'datetime-local\' name=\'datetime\' class=\'pwp-input\'>\n')">DateTime</button>
+			</div>
+			<!-- Choice -->
+			<div class="pwp-toolbar-group">
+				<span class="pwp-toolbar-label">Choice</span>
+				<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label>Select</label>\n<select name=\'choice\' class=\'pwp-input\'>\n  <option value=\'1\'>Option 1</option>\n  <option value=\'2\'>Option 2</option>\n</select>\n')">Select</button>
+				<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label>Multi-Select</label>\n<select name=\'multi_choice[]\' class=\'pwp-input\' multiple>\n  <option value=\'1\'>Option 1</option>\n  <option value=\'2\'>Option 2</option>\n</select>\n')">Multiple</button>
+				<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label><input type=\'radio\' name=\'radio_group\' value=\'1\'> Option 1</label>\n<label><input type=\'radio\' name=\'radio_group\' value=\'2\'> Option 2</label>\n')">Radio</button>
+				<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label><input type=\'checkbox\' name=\'checkbox_1\' value=\'1\'> Check me</label>\n')">Checkbox</button>
+			</div>
+			<!-- Content/Files -->
+			<div class="pwp-toolbar-group">
+				<span class="pwp-toolbar-label">Content</span>
+				<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label>Message</label>\n<textarea name=\'message\' class=\'pwp-textarea\' rows=\'4\'></textarea>\n')">Textarea</button>
+				<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label>Upload</label>\n<input type=\'file\' name=\'file\' class=\'pwp-input\'>\n')">File</button>
+			</div>
+			<!-- UI/Logic -->
+			<div class="pwp-toolbar-group">
+				<span class="pwp-toolbar-label">Misc</span>
+				<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label>Color</label>\n<input type=\'color\' name=\'color\' class=\'pwp-input\'>\n')">Color</button>
+				<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<input type=\'hidden\' name=\'hidden_field\' value=\'my_value\'>\n')">Hidden</button>
+			</div>
+			<!-- Action -->
+			<div class="pwp-toolbar-group">
+				<span class="pwp-toolbar-label">Action</span>
+				<button type="button" class="pwp-btn-insert primary" onclick="pwpInsert('<button type=\'submit\' class=\'pwp-btn\'>Submit Form</button>\n')">Submit Button</button>
+			</div>
 		</div>
 
-		<textarea id="pwp_form_html" name="pwp_form_html" rows="15" style="width:100%; font-family:monospace; background:#fafafa; color:#333;"><?php echo esc_textarea( $html ); ?></textarea>
+		<textarea id="pwp_form_html" name="pwp_form_html" rows="20" style="width:100%; font-family:monospace; background:#fafafa; color:#333; border-top:0;"><?php echo esc_textarea( $html ); ?></textarea>
 
 		<script>
-		function pwpInsertAtCursor(myValue) {
+		function pwpInsert(myValue) {
 			var myField = document.getElementById('pwp_form_html');
 			if (document.selection) {
 				myField.focus();
@@ -157,6 +209,7 @@ class PWP_Form_Manager {
 			} else {
 				myField.value += myValue;
 			}
+			myField.focus(); // Re-focus
 		}
 		</script>
 		<?php
