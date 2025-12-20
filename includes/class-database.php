@@ -84,8 +84,18 @@ class PWP_Database {
 						// Assuming file_path is full path or relative to uploads
 						// We will need to ensure how we store paths. 
 						// For now, assume absolute path or handle later.
-						if ( file_exists( $file_path ) ) {
-							unlink( $file_path );
+						// Security: Ensure file is within WP Uploads directory
+						$upload_dir = wp_upload_dir();
+						$base_dir = $upload_dir['basedir'];
+						
+						// Normalize paths for comparison (Windows/Unix)
+						$real_path = realpath( $file_path );
+						$real_base = realpath( $base_dir );
+
+						if ( $real_path && $real_base && strpos( $real_path, $real_base ) === 0 ) {
+							if ( file_exists( $file_path ) ) {
+								unlink( $file_path );
+							}
 						}
 					}
 				}
