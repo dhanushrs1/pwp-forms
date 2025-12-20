@@ -126,6 +126,16 @@ class PWP_Form_Render {
 		// We add a honeypot field hidden
 		$honeypot = '<div style="display:none;"><input type="text" name="pwp_hp_check" value=""></div>';
 		
+		// 4.5 Auto-Append Submit Button Logic
+		// Check if a submit button already exists
+		if ( strpos( $form_html, 'type="submit"' ) === false && strpos( $form_html, "type='submit'" ) === false ) {
+			// Append Default Submit Button
+			$label = 'Submit';
+			$form_html .= '<div class="pwp-submit-wrapper" style="margin-top:20px;">
+				<button type="submit" class="pwp-btn pwp-submit" style="cursor:pointer; padding:10px 20px; background:#0073aa; color:#fff; border:none; border-radius:4px;">' . esc_html( $label ) . '</button>
+			</div>';
+		}
+
 		// Captcha
 		$captcha_provider = get_option( 'pwp_captcha_provider', 'none' );
 		$site_key = get_option( 'pwp_turnstile_site_key', '' );

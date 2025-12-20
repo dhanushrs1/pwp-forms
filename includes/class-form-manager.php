@@ -135,26 +135,45 @@ class PWP_Form_Manager {
 				background: #fcfcfc;
 				border: 1px solid #dcdcde;
 				border-bottom: 0;
-				padding: 15px;
+				padding: 10px 15px;
+				overflow-x: auto;
+				white-space: nowrap;
+				display: flex;
+				gap: 20px;
+				align-items: center;
+				/* Hide scrollbar for cleaner look but allow scroll */
+				scrollbar-width: thin;
+			}
+			#pwp-toolbar-container::-webkit-scrollbar {
+				height: 8px;
+			}
+			#pwp-toolbar-container::-webkit-scrollbar-thumb {
+				background: #ccc;
+				border-radius: 4px;
 			}
 			.pwp-toolbar-section {
-				margin-bottom: 15px;
+				display: inline-flex;
+				flex-direction: column;
+				margin-bottom: 0;
+				padding-right: 20px;
+				border-right: 1px solid #eee;
+				min-width: max-content;
 			}
 			.pwp-toolbar-section:last-child {
-				margin-bottom: 0;
+				border-right: none;
+				padding-right: 0;
 			}
 			.pwp-section-title {
-				font-size: 11px;
+				font-size: 10px;
 				text-transform: uppercase;
-				color: #646970;
+				color: #888;
 				font-weight: 600;
-				margin-bottom: 8px;
+				margin-bottom: 6px;
 				letter-spacing: 0.5px;
 			}
 			.pwp-btn-grid {
 				display: flex;
-				flex-wrap: wrap;
-				gap: 8px;
+				gap: 6px;
 			}
 			.pwp-btn-insert {
 				display: inline-flex;
@@ -162,7 +181,7 @@ class PWP_Form_Manager {
 				background: #fff;
 				border: 1px solid #c3c4c7;
 				color: #2c3338;
-				padding: 6px 12px;
+				padding: 6px 10px;
 				font-size: 13px;
 				border-radius: 4px;
 				cursor: pointer;
@@ -180,24 +199,11 @@ class PWP_Form_Manager {
 				font-size: 16px;
 				width: 16px;
 				height: 16px;
-				margin-right: 6px;
+				margin-right: 4px;
 				color: #50575e;
 			}
 			.pwp-btn-insert:hover .dashicons {
 				color: #2271b1;
-			}
-			.pwp-btn-insert.primary {
-				background: #f0f6fc;
-				border-color: #2271b1;
-				color: #2271b1;
-				font-weight: 500;
-			}
-			.pwp-btn-insert.primary:hover {
-				background: #2271b1;
-				color: white;
-			}
-			.pwp-btn-insert.primary:hover .dashicons {
-				color: white;
 			}
 		</style>
 
@@ -207,19 +213,19 @@ class PWP_Form_Manager {
 			<div class="pwp-toolbar-section">
 				<div class="pwp-section-title">Essentials</div>
 				<div class="pwp-btn-grid">
-					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label>Name</label>\n<input type=\'text\' name=\'name\' class=\'pwp-input\' required>\n')">
+					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label>Name</label>\n<input type=\'text\' name=\'name\' class=\'pwp-input\' placeholder=\'Enter your name...\' required>\n')">
 						<span class="dashicons dashicons-admin-users"></span> Name
 					</button>
-					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label>Email Address</label>\n<input type=\'email\' name=\'email\' class=\'pwp-input\' required>\n')">
+					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label>Email Address</label>\n<input type=\'email\' name=\'email\' class=\'pwp-input\' placeholder=\'Enter your email...\' required>\n')">
 						<span class="dashicons dashicons-email"></span> Email
 					</button>
-					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label>Phone Number</label>\n<input type=\'tel\' name=\'phone\' class=\'pwp-input\'>\n')">
+					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label>Phone Number</label>\n<input type=\'tel\' name=\'phone\' class=\'pwp-input\' placeholder=\'+1 (555) 000-0000\'>\n')">
 						<span class="dashicons dashicons-phone"></span> Phone
 					</button>
-					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label>Website URL</label>\n<input type=\'url\' name=\'website\' class=\'pwp-input\'>\n')">
+					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label>Website URL</label>\n<input type=\'url\' name=\'website\' class=\'pwp-input\' placeholder=\'https://example.com\'>\n')">
 						<span class="dashicons dashicons-admin-links"></span> URL
 					</button>
-					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label>Password</label>\n<input type=\'password\' name=\'password\' class=\'pwp-input\'>\n')">
+					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label>Password</label>\n<input type=\'password\' name=\'password\' class=\'pwp-input\' placeholder=\'Enter secure password\'>\n')">
 						<span class="dashicons dashicons-lock"></span> Password
 					</button>
 				</div>
@@ -229,7 +235,7 @@ class PWP_Form_Manager {
 			<div class="pwp-toolbar-section">
 				<div class="pwp-section-title">Data Inputs</div>
 				<div class="pwp-btn-grid">
-					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label>Number</label>\n<input type=\'number\' name=\'number\' class=\'pwp-input\'>\n')">
+					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label>Number</label>\n<input type=\'number\' name=\'number\' class=\'pwp-input\' placeholder=\'0\'>\n')">
 						<span class="dashicons dashicons-calculator"></span> Number
 					</button>
 					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label>Date</label>\n<input type=\'date\' name=\'date\' class=\'pwp-input\'>\n')">
@@ -248,16 +254,16 @@ class PWP_Form_Manager {
 			<div class="pwp-toolbar-section">
 				<div class="pwp-section-title">Choices & Options</div>
 				<div class="pwp-btn-grid">
-					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label>Dropdown</label>\n<select name=\'choice\' class=\'pwp-input\'>\n  <option value=\'1\'>Option 1</option>\n  <option value=\'2\'>Option 2</option>\n</select>\n')">
+					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label>Dropdown</label>\n<select name=\'choice\' class=\'pwp-input\'>\n  <option value=\'Option 1\'>Option 1</option>\n  <option value=\'Option 2\'>Option 2</option>\n</select>\n')">
 						<span class="dashicons dashicons-arrow-down-alt2"></span> Select
 					</button>
-					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label>Multi Select</label>\n<select name=\'multi_choice[]\' class=\'pwp-input\' multiple>\n  <option value=\'1\'>Option 1</option>\n  <option value=\'2\'>Option 2</option>\n</select>\n')">
+					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label>Multi Select</label>\n<select name=\'multi_choice[]\' class=\'pwp-input\' multiple>\n  <option value=\'Option 1\'>Option 1</option>\n  <option value=\'Option 2\'>Option 2</option>\n</select>\n')">
 						<span class="dashicons dashicons-list-view"></span> Multi
 					</button>
-					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label><input type=\'radio\' name=\'radio_group\' value=\'1\'> Option 1</label>\n<label><input type=\'radio\' name=\'radio_group\' value=\'2\'> Option 2</label>\n')">
+					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label class=\'pwp-radio\'><input type=\'radio\' name=\'radio_group\' value=\'Option 1\'> Option 1</label>\n<label class=\'pwp-radio\'><input type=\'radio\' name=\'radio_group\' value=\'Option 2\'> Option 2</label>\n')">
 						<span class="dashicons dashicons-marker"></span> Radio
 					</button>
-					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label><input type=\'checkbox\' name=\'checkbox_1\' value=\'1\'> Check me</label>\n')">
+					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label class=\'pwp-checkbox\'><input type=\'checkbox\' name=\'agree\' value=\'Yes\'> I agree</label>\n')">
 						<span class="dashicons dashicons-yes"></span> Checkbox
 					</button>
 				</div>
@@ -267,23 +273,14 @@ class PWP_Form_Manager {
 			<div class="pwp-toolbar-section">
 				<div class="pwp-section-title">Large Content</div>
 				<div class="pwp-btn-grid">
-					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label>Message</label>\n<textarea name=\'message\' class=\'pwp-textarea\' rows=\'4\'></textarea>\n')">
+					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label>Message</label>\n<textarea name=\'message\' class=\'pwp-textarea\' rows=\'4\' placeholder=\'Type your message here...\'></textarea>\n')">
 						<span class="dashicons dashicons-text-page"></span> Text Area
 					</button>
 					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label>Upload File</label>\n<input type=\'file\' name=\'file\' class=\'pwp-input\'>\n')">
 						<span class="dashicons dashicons-paperclip"></span> File Upload
 					</button>
-				</div>
-			</div>
-
-			<!-- Submit -->
-			<div class="pwp-toolbar-section" style="margin-top:20px; border-top:1px solid #eee; padding-top:15px;">
-				<div class="pwp-btn-grid">
-					<button type="button" class="pwp-btn-insert primary" onclick="pwpInsert('<button type=\'submit\' class=\'pwp-btn\'>Submit Form</button>\n')">
-						<span class="dashicons dashicons-saved"></span> <strong>Insert Submit Button</strong>
-					</button>
 					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<input type=\'hidden\' name=\'hidden_field\' value=\'my_value\'>\n')">
-						<span class="dashicons dashicons-hidden"></span> Hidden Field
+						<span class="dashicons dashicons-hidden"></span> Hidden
 					</button>
 				</div>
 			</div>
