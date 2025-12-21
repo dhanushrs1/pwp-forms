@@ -213,19 +213,19 @@ class PWP_Form_Manager {
 			<div class="pwp-toolbar-section">
 				<div class="pwp-section-title">Essentials</div>
 				<div class="pwp-btn-grid">
-					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label>Name</label>\n<input type=\'text\' name=\'name\' class=\'pwp-input\' placeholder=\'Enter your name...\' required>\n')">
+					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<div class=\'pwp-field\'>\n<label>Name</label>\n<input type=\'text\' name=\'name\' class=\'pwp-input\' placeholder=\'Enter your name...\' required>\n</div>\n')">
 						<span class="dashicons dashicons-admin-users"></span> Name
 					</button>
-					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label>Email Address</label>\n<input type=\'email\' name=\'email\' class=\'pwp-input\' placeholder=\'Enter your email...\' required>\n')">
+					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<div class=\'pwp-field\'>\n<label>Email Address</label>\n<input type=\'email\' name=\'email\' class=\'pwp-input\' placeholder=\'Enter your email...\' required>\n</div>\n')">
 						<span class="dashicons dashicons-email"></span> Email
 					</button>
-					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label>Phone Number</label>\n<input type=\'tel\' name=\'phone\' class=\'pwp-input\' placeholder=\'+1 (555) 000-0000\'>\n')">
+					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<div class=\'pwp-field\'>\n<label>Phone Number</label>\n<input type=\'tel\' name=\'phone\' class=\'pwp-input\' placeholder=\'+1 (555) 000-0000\'>\n</div>\n')">
 						<span class="dashicons dashicons-phone"></span> Phone
 					</button>
-					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label>Website URL</label>\n<input type=\'url\' name=\'website\' class=\'pwp-input\' placeholder=\'https://example.com\'>\n')">
+					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<div class=\'pwp-field\'>\n<label>Website URL</label>\n<input type=\'url\' name=\'website\' class=\'pwp-input\' placeholder=\'https://example.com\'>\n</div>\n')">
 						<span class="dashicons dashicons-admin-links"></span> URL
 					</button>
-					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label>Password</label>\n<input type=\'password\' name=\'password\' class=\'pwp-input\' placeholder=\'Enter secure password\'>\n')">
+					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<div class=\'pwp-field\'>\n<label>Password</label>\n<input type=\'password\' name=\'password\' class=\'pwp-input\' placeholder=\'Enter secure password\'>\n</div>\n')">
 						<span class="dashicons dashicons-lock"></span> Password
 					</button>
 				</div>
@@ -235,16 +235,16 @@ class PWP_Form_Manager {
 			<div class="pwp-toolbar-section">
 				<div class="pwp-section-title">Data Inputs</div>
 				<div class="pwp-btn-grid">
-					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label>Number</label>\n<input type=\'number\' name=\'number\' class=\'pwp-input\' placeholder=\'0\'>\n')">
+					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<div class=\'pwp-field\'>\n<label>Number</label>\n<input type=\'number\' name=\'number\' class=\'pwp-input\' placeholder=\'0\'>\n</div>\n')">
 						<span class="dashicons dashicons-calculator"></span> Number
 					</button>
-					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label>Date</label>\n<input type=\'date\' name=\'date\' class=\'pwp-input\'>\n')">
+					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<div class=\'pwp-field\'>\n<label>Date</label>\n<input type=\'date\' name=\'date\' class=\'pwp-input\'>\n</div>\n')">
 						<span class="dashicons dashicons-calendar-alt"></span> Date
 					</button>
-					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label>Time</label>\n<input type=\'time\' name=\'time\' class=\'pwp-input\'>\n')">
+					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<div class=\'pwp-field\'>\n<label>Time</label>\n<input type=\'time\' name=\'time\' class=\'pwp-input\'>\n</div>\n')">
 						<span class="dashicons dashicons-clock"></span> Time
 					</button>
-					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label>Color Picker</label>\n<input type=\'color\' name=\'color\' class=\'pwp-input\'>\n')">
+					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<div class=\'pwp-field\'>\n<label>Color Picker</label>\n<input type=\'color\' name=\'color\' class=\'pwp-input\'>\n</div>\n')">
 						<span class="dashicons dashicons-art"></span> Color
 					</button>
 				</div>
@@ -254,16 +254,16 @@ class PWP_Form_Manager {
 			<div class="pwp-toolbar-section">
 				<div class="pwp-section-title">Choices & Options</div>
 				<div class="pwp-btn-grid">
-					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label>Dropdown</label>\n<select name=\'choice\' class=\'pwp-input\'>\n  <option value=\'Option 1\'>Option 1</option>\n  <option value=\'Option 2\'>Option 2</option>\n</select>\n')">
+					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<div class=\'pwp-field\'>\n<label>Dropdown</label>\n<select name=\'choice\' class=\'pwp-input\'>\n  <option value=\'Option 1\'>Option 1</option>\n  <option value=\'Option 2\'>Option 2</option>\n</select>\n</div>\n')">
 						<span class="dashicons dashicons-arrow-down-alt2"></span> Select
 					</button>
-					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label>Multi Select</label>\n<select name=\'multi_choice[]\' class=\'pwp-input\' multiple>\n  <option value=\'Option 1\'>Option 1</option>\n  <option value=\'Option 2\'>Option 2</option>\n</select>\n')">
+					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<div class=\'pwp-field\'>\n<label>Multi Select</label>\n<select name=\'multi_choice[]\' class=\'pwp-input\' multiple>\n  <option value=\'Option 1\'>Option 1</option>\n  <option value=\'Option 2\'>Option 2</option>\n</select>\n</div>\n')">
 						<span class="dashicons dashicons-list-view"></span> Multi
 					</button>
-					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label class=\'pwp-radio\'><input type=\'radio\' name=\'radio_group\' value=\'Option 1\'> Option 1</label>\n<label class=\'pwp-radio\'><input type=\'radio\' name=\'radio_group\' value=\'Option 2\'> Option 2</label>\n')">
+					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<div class=\'pwp-field\'>\n<label class=\'pwp-radio\'><input type=\'radio\' name=\'radio_group\' value=\'Option 1\'> Option 1</label>\n<div class=\'pwp-field\'>\n<label class=\'pwp-radio\'><input type=\'radio\' name=\'radio_group\' value=\'Option 2\'> Option 2</label>\n</div>\n')">
 						<span class="dashicons dashicons-marker"></span> Radio
 					</button>
-					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label class=\'pwp-checkbox\'><input type=\'checkbox\' name=\'agree\' value=\'Yes\'> I agree</label>\n')">
+					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<div class=\'pwp-field\'>\n<label class=\'pwp-checkbox\'><input type=\'checkbox\' name=\'agree\' value=\'Yes\'> I agree</label>\n</div>\n')">
 						<span class="dashicons dashicons-yes"></span> Checkbox
 					</button>
 				</div>
@@ -273,10 +273,10 @@ class PWP_Form_Manager {
 			<div class="pwp-toolbar-section">
 				<div class="pwp-section-title">Large Content</div>
 				<div class="pwp-btn-grid">
-					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label>Message</label>\n<textarea name=\'message\' class=\'pwp-textarea\' rows=\'4\' placeholder=\'Type your message here...\'></textarea>\n')">
+					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<div class=\'pwp-field\'>\n<label>Message</label>\n<textarea name=\'message\' class=\'pwp-textarea\' rows=\'4\' placeholder=\'Type your message here...\'></textarea>\n</div>\n')">
 						<span class="dashicons dashicons-text-page"></span> Text Area
 					</button>
-					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<label>Upload File</label>\n<input type=\'file\' name=\'file\' class=\'pwp-input\'>\n')">
+					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<div class=\'pwp-field\'>\n<label>Upload File</label>\n<input type=\'file\' name=\'file\' class=\'pwp-input\'>\n</div>\n')">
 						<span class="dashicons dashicons-paperclip"></span> File Upload
 					</button>
 					<button type="button" class="pwp-btn-insert" onclick="pwpInsert('<input type=\'hidden\' name=\'hidden_field\' value=\'my_value\'>\n')">

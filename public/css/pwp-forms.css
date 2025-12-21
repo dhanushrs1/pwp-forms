@@ -11,17 +11,40 @@
     box-sizing: border-box;
 }
 
+
+/* Field Container */
+.pwp-form .pwp-field {
+    margin-bottom: 20px;
+    position: relative;
+    width: 100%;
+}
+
+@media (min-width: 600px) {
+    .pwp-form .pwp-field.pwp-half {
+        display: inline-block;
+        width: 48%;
+        margin-right: 2%;
+        vertical-align: top;
+    }
+    .pwp-form .pwp-field.pwp-half:nth-child(2n) {
+        margin-right: 0;
+    }
+    .pwp-form .pwp-field.pwp-third {
+        display: inline-block;
+        width: 31%; /* fallback */
+        width: calc(33.333% - 10px);
+        margin-right: 15px;
+        vertical-align: top;
+    }
+}
+
 /* Labels */
 .pwp-form label {
     display: block;
     margin-bottom: 6px;
     font-weight: 600;
     color: #333;
-    margin-top: 15px;
-}
-
-.pwp-form label:first-child {
-    margin-top: 0;
+    margin-top: 0; /* Let container handle spacing */
 }
 
 /* Inputs & Textareas */
