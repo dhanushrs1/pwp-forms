@@ -3,7 +3,7 @@
  * Plugin Name: ProWPKit Forms
  * Plugin URI: https://prowpkit.com
  * Description: A developer-first, secure, and professional form builder for Pro WP Kit.
- * Version: 1.0.1
+ * Version: 1.0.2
  * Author: Pro WP Kit Team
  * Text Domain: prowpkit-forms
  * Requires PHP: 8.0
@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define Constants
-define( 'PWP_FORMS_VERSION', '1.0.1' );
+define( 'PWP_FORMS_VERSION', '1.0.2' );
 define( 'PWP_FORMS_PATH', plugin_dir_path( __FILE__ ) );
 define( 'PWP_FORMS_URL', plugin_dir_url( __FILE__ ) );
 

@@ -3,7 +3,7 @@ Contributors: prowpkit
 Tags: form, contact, support, upload, captcha, secure
 Requires at least: 6.0
 Tested up to: 6.7
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 License: GPLv2 or later
 
 A developer-first, secure, and professional form builder for Pro WP Kit.
@@ -33,6 +33,19 @@ ProWPKit Forms is a robust solution for handling contact forms, support tickets,
 4.  Use the shortcode `[pwp_form id="123"]` to display the form on any page.
 
 == Changelog ==
+
+= 1.0.2 =
+
+- **Form Builder Improvements**:
+  - Implemented horizontally scrollable toolbar for better accessibility.
+  - Updated field snippets to include placeholders and human-readable values.
+  - Replaced manual submit button with an automatic, mandatory submit button.
+- **Email & Notifications**:
+  - Added visual color swatches for color picker values in emails.
+- **Submission Management**:
+  - Standardized default submission status to 'New'.
+  - Added 'Closed' status for better workflow management.
+  - Fixed status display issues in dashboard.
 
 = 1.0.1 =
 
