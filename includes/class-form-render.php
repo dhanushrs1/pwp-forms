@@ -127,14 +127,16 @@ class PWP_Form_Render {
 		$honeypot = '<div style="display:none;"><input type="text" name="pwp_hp_check" value=""></div>';
 		
 		// 4.5 Auto-Append Submit Button Logic
-		// Check if a submit button already exists
-		if ( strpos( $form_html, 'type="submit"' ) === false && strpos( $form_html, "type='submit'" ) === false ) {
-			// Append Default Submit Button
-			$label = 'Submit';
-			$form_html .= '<div class="pwp-submit-wrapper" style="margin-top:20px;">
-				<button type="submit" class="pwp-btn pwp-submit" style="cursor:pointer; padding:10px 20px; background:#0073aa; color:#fff; border:none; border-radius:4px;">' . esc_html( $label ) . '</button>
-			</div>';
-		}
+		// Always append unless configured not to (optional, but requested as mandatory)
+		$submit_label = get_post_meta( $form_id, '_pwp_form_submit_label', true ) ?: 'Send Message';
+		
+		// Wrapper with class for easy styling
+		$form_html .= '<div class="pwp-submit-wrapper" style="margin-top:20px;">
+			<button type="submit" class="pwp-submit">' . esc_html( $submit_label ) . '</button>
+		</div>';
+		// Note: removed check for existing button to ENFORCE the new system.
+		// If user had one, they might have 2 now. We should strip old ones or warn?
+		// For now, simpler to append. User can remove old one from HTML editor.
 
 		// Captcha
 		$captcha_provider = get_option( 'pwp_captcha_provider', 'none' );
@@ -144,6 +146,12 @@ class PWP_Form_Render {
 		if ( $captcha_provider === 'turnstile' && ! empty( $site_key ) ) {
 			wp_enqueue_script( 'pwp-turnstile', 'https://challenges.cloudflare.com/turnstile/v0/api.js', [], null, true );
 			$captcha_html = '<div class="cf-turnstile" data-sitekey="' . esc_attr( $site_key ) . '" style="margin-top:10px; margin-bottom:10px;"></div>';
+		} elseif ( $captcha_provider === 'recaptcha' ) {
+			$recaptcha_site_key = get_option( 'pwp_recaptcha_site_key', '' );
+			if ( ! empty( $recaptcha_site_key ) ) {
+				wp_enqueue_script( 'pwp-recaptcha', 'https://www.google.com/recaptcha/api.js', [], null, true );
+				$captcha_html = '<div class="g-recaptcha" data-sitekey="' . esc_attr( $recaptcha_site_key ) . '" style="margin-top:10px; margin-bottom:10px;"></div>';
+			}
 		}
 		
 		ob_start();

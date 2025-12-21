@@ -1,49 +1,233 @@
-.pwp-settings-wrapper {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  margin-right: 20px;
+/* --- General Containers --- */
+.pwp-email-settings-container {
+    max-width: 800px;
+    margin-top: 20px;
 }
 
-.pwp-settings-panel {
-  flex: 1;
-  min-width: 300px;
-  background: #fff;
-  padding: 20px;
-  border: 1px solid #ccd0d4;
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+/* --- Cards --- */
+.pwp-card {
+    background: #fff;
+    border: 1px solid #dcdcde;
+    border-radius: 8px; /* Clean rounded corners */
+    margin-bottom: 25px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
 }
 
-.pwp-preview-panel {
-  flex: 1;
-  min-width: 300px;
-  position: sticky;
-  top: 50px;
-  height: calc(100vh - 100px);
+.pwp-card-header {
+    padding: 20px;
+    border-bottom: 1px solid #f0f0f1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pwp-card-header h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #1d2327;
+}
+
+.pwp-card-header .description {
+    margin: 4px 0 0 0;
+    font-size: 13px;
+    color: #646970;
+}
+
+.pwp-card-body {
+    padding: 20px;
+}
+
+/* --- Form Groups & Grid --- */
+.pwp-form-group {
+    margin-bottom: 15px;
+}
+
+.pwp-form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #2c3338;
+}
+
+.pwp-form-group input.regular-text,
+.pwp-form-group textarea {
+    width: 100%;
+    margin: 0;
+}
+
+.pwp-grid-col-2 {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+}
+
+.pwp-grid-col-2-inner {
+    display: flex;
+    gap: 15px;
+}
+
+/* --- Color Visuals --- */
+.pwp-color-palette-row {
+    display: flex;
+    gap: 30px;
+    margin-top: 25px;
+    margin-bottom: 15px;
+    padding: 20px;
+    background: #fcfcfd;
+    border-radius: 6px;
+    border: 1px solid #f0f0f1;
+}
+
+.pwp-color-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.pwp-color-group label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #646970;
+}
+
+/* --- Editor & Toolbar --- */
+.pwp-toolbar {
+    background: #fbfbfc;
+    padding: 12px 20px;
+    border-bottom: 1px solid #f0f0f1;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.toolbar-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: #8c8f94;
+    margin-right: 10px;
+    letter-spacing: 0.5px;
+}
+
+.pwp-pill-btn {
+    border: 1px solid #dcdcde;
+    background: #fff;
+    border-radius: 100px; /* Pill */
+    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #50575e;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.pwp-pill-btn:hover {
+    border-color: #2271b1;
+    color: #2271b1;
+    background: #f0f6fc;
+}
+
+.pwp-editor-area textarea {
+    border: none;
+    box-shadow: none;
+    padding: 20px;
+    font-family: 'Consolas', monospace;
+    line-height: 1.6;
+    color: #2c3338;
+}
+
+.pwp-header-actions .button {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* --- Modal --- */
+.pwp-modal {
+    display: none; /* Hidden by default */
+    position: fixed; 
+    z-index: 99999; 
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    overflow: hidden; 
+    background-color: rgba(0,0,0,0.6); 
+    animation: pwpFadeIn 0.2s;
+    backdrop-filter: blur(2px);
+}
+
+.pwp-modal-content {
+    background-color: #fefefe;
+    margin: 5vh auto; 
+    padding: 0;
+    border: none;
+    width: 65%; /* Width of modal */
+    height: 90vh;
+    border-radius: 8px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    display: flex;
+    flex-direction: column;
+}
+
+.pwp-modal-header {
+    padding: 15px 20px;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+    border-radius: 8px 8px 0 0;
+}
+
+.pwp-modal-header h3 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.pwp-modal-close {
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    background: none;
+    border: none;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.pwp-modal-close:hover,
+.pwp-modal-close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.pwp-modal-body {
+    flex: 1;
+    padding: 0;
+    background: #f0f0f1; /* Frame background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 #pwp-email-preview-frame {
-  width: 100%;
-  height: 100%;
-  border: 1px solid #ddd;
-  background: #fff;
-  border-radius: 4px;
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: #fff;
 }
 
-.pwp-preview-header {
-  margin-bottom: 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+@keyframes pwpFadeIn {
+    from {opacity: 0} 
+    to {opacity: 1}
 }
 
-.pwp-preview-controls button {
-  cursor: pointer;
-}
-
-.pwp-preview-controls button.active {
-  font-weight: bold;
-  background: #0073aa;
-  color: #fff;
-  border-color: #0073aa;
+.pwp-save-bar {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #dcdcde;
 }

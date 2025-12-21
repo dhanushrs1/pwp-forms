@@ -20,23 +20,49 @@ class PWP_Form_Submit {
 			wp_send_json_error( [ 'message' => 'Security check failed.' ] );
 		}
 
-		// 2. Honeypot Check
+		$form_id = isset( $_POST['form_id'] ) ? intval( $_POST['form_id'] ) : 0;
+		if ( ! $form_id ) {
+			wp_send_json_error( [ 'message' => 'Invalid form.' ] );
+		}
+
+		// Fetch Custom Messages
+		$msg_spam = get_post_meta( $form_id, '_pwp_msg_spam', true ) ?: 'Spam detected. Access denied.';
+		$msg_validation = get_post_meta( $form_id, '_pwp_msg_validation_error', true ) ?: 'One or more fields have an error. Please check and try again.';
+		$msg_invalid_email = get_post_meta( $form_id, '_pwp_msg_invalid_email', true ) ?: 'Please enter a valid email address.';
+		$msg_upload_fail = get_post_meta( $form_id, '_pwp_msg_upload_failed', true ) ?: 'There was an unknown error uploading the file.';
+
+		// Honeypot Check (Late check to use custom message)
 		if ( ! empty( $_POST['pwp_hp_check'] ) ) {
-			wp_send_json_error( [ 'message' => 'Spam detected.' ] );
+			wp_send_json_error( [ 'message' => $msg_spam ] );
 		}
 
 		// 2.5 Captcha Check
 		$captcha_provider = get_option( 'pwp_captcha_provider', 'none' );
 		if ( $captcha_provider === 'turnstile' ) {
+			// ... (Turnstile logic unchanged) ... 
 			$token = isset( $_POST['cf-turnstile-response'] ) ? sanitize_text_field( $_POST['cf-turnstile-response'] ) : '';
 			$secret = get_option( 'pwp_turnstile_secret_key', '' );
+			if ( empty( $token ) ) wp_send_json_error( [ 'message' => $msg_spam ] ); // Unified spam msg or specifics? Stick to spam msg for user simplicity.
 			
+			$response = wp_remote_post( 'https://challenges.cloudflare.com/turnstile/v0/siteverify', [
+				'body' => [ 'secret' => $secret, 'response' => $token, 'remoteip' => $_SERVER['REMOTE_ADDR'] ]
+			] );
+			if ( is_wp_error( $response ) ) wp_send_json_error( [ 'message' => $msg_spam ] );
+			
+			$body = wp_remote_retrieve_body( $response );
+			$result = json_decode( $body, true );
+			if ( ! $result || ! $result['success'] ) wp_send_json_error( [ 'message' => $msg_spam ] );
+
+		} elseif ( $captcha_provider === 'recaptcha' ) {
+			$token = isset( $_POST['g-recaptcha-response'] ) ? sanitize_text_field( $_POST['g-recaptcha-response'] ) : '';
+			$secret = get_option( 'pwp_recaptcha_secret_key', '' );
+
 			if ( empty( $token ) ) {
-				wp_send_json_error( [ 'message' => 'Captcha verification failed (missing token).' ] );
+				wp_send_json_error( [ 'message' => $msg_spam ] );
 			}
 
-			// Verify with Cloudflare
-			$response = wp_remote_post( 'https://challenges.cloudflare.com/turnstile/v0/siteverify', [
+			// Verify with Google
+			$response = wp_remote_post( 'https://www.google.com/recaptcha/api/siteverify', [
 				'body' => [
 					'secret' => $secret,
 					'response' => $token,
@@ -45,20 +71,15 @@ class PWP_Form_Submit {
 			] );
 
 			if ( is_wp_error( $response ) ) {
-				wp_send_json_error( [ 'message' => 'Captcha verification error.' ] );
+				wp_send_json_error( [ 'message' => $msg_spam ] );
 			}
 
 			$body = wp_remote_retrieve_body( $response );
 			$result = json_decode( $body, true );
 
 			if ( ! $result || ! $result['success'] ) {
-				wp_send_json_error( [ 'message' => 'Captcha verification failed.' ] );
+				wp_send_json_error( [ 'message' => $msg_spam ] );
 			}
-		}
-
-		$form_id = isset( $_POST['form_id'] ) ? intval( $_POST['form_id'] ) : 0;
-		if ( ! $form_id ) {
-			wp_send_json_error( [ 'message' => 'Invalid form.' ] );
 		}
 
 		// 3. Get Form Settings & Capability Check
@@ -78,10 +99,7 @@ class PWP_Form_Submit {
 				wp_send_json_error( [ 'message' => 'Support tickets require a user account.' ] );
 			}
 			// If Guest trying to upload files (unless we add specific exception later, rule says guests blocked)
-			if ( ! empty( $_FILES ) && ! empty( $uploads_enabled ) ) { // If uploads enabled generally, but user is guest -> Block? 
-				// The prompt says: "Guest Users ... Guests MUST NOT be allowed to ... Upload files (unless explicitly allowed with strict limits)"
-				// And later: "Upload Permission: Guest ❌ Disabled".
-				// So we STRICTLY block guest uploads.
+			if ( ! empty( $_FILES ) && ! empty( $uploads_enabled ) ) { 
 				wp_send_json_error( [ 'message' => 'Guests are not allowed to upload files.' ] );
 			}
 		}
@@ -115,7 +133,7 @@ class PWP_Form_Submit {
 			// Guest: Trust POST data (sanitized)
 			$user_email = isset( $submission_data['email'] ) ? sanitize_email( $submission_data['email'] ) : '';
 			if ( ! is_email( $user_email ) ) {
-				wp_send_json_error( [ 'message' => 'Invalid email address.' ] );
+				wp_send_json_error( [ 'message' => $msg_invalid_email ] );
 			}
 		}
 
@@ -128,7 +146,9 @@ class PWP_Form_Submit {
 			if ( class_exists( 'PWP_Upload_Handler' ) ) {
 				$upload_result = PWP_Upload_Handler::handle_uploads( $_FILES, $form_id );
 				if ( is_wp_error( $upload_result ) ) {
-					wp_send_json_error( [ 'message' => $upload_result->get_error_message() ] );
+					// Append error detail or just show generic?
+					// Use custom upload fail message, maybe append detail
+					wp_send_json_error( [ 'message' => $msg_upload_fail . ' (' . $upload_result->get_error_message() . ')' ] );
 				}
 				$uploaded_files = $upload_result;
 			}
@@ -163,7 +183,7 @@ class PWP_Form_Submit {
 		}
 
 		// 8. Return Success
-		$success_msg = get_post_meta( $form_id, '_pwp_form_success_message', true ) ?: 'Thank you for your submission.';
-		wp_send_json_success( [ 'message' => $success_msg ] );
+		$msg_success = get_post_meta( $form_id, '_pwp_msg_success', true ) ?: 'Thank you for your message. It has been sent.';
+		wp_send_json_success( [ 'message' => $msg_success ] );
 	}
 }

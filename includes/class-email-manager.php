@@ -14,100 +14,104 @@ class PWP_Email_Manager {
 	 * @param array $data
 	 * @param array $files Paths
 	 */
-    public static function send_notifications( $submission_id, $form_id, $data, $files = [] ) {
-        $admin_emails_str = get_post_meta( $form_id, '_pwp_email_to', true ) ?: get_option( 'admin_email' );
-        $subject_tmpl = get_post_meta( $form_id, '_pwp_email_subject', true ) ?: 'New Form Submission';
+	/**
+	 * Send Notifications
+	 *
+	 * @param int $submission_id
+	 * @param int $form_id
+	 * @param array $data
+	 * @param array $files Paths
+	 */
+	public static function send_notifications( $submission_id, $form_id, $data, $files = [] ) {
+		// 1. Fetch Form Settings (Meta)
+		$to          = get_post_meta( $form_id, '_pwp_mail_to', true ) ?: get_option( 'admin_email' );
+		$from_header = get_post_meta( $form_id, '_pwp_mail_from', true ) ?: get_bloginfo( 'name' ) . ' <wordpress@' . $_SERVER['HTTP_HOST'] . '>';
+		$subject_tmpl= get_post_meta( $form_id, '_pwp_mail_subject', true ) ?: 'New Submission: [your-subject]';
+		$headers_tmpl= get_post_meta( $form_id, '_pwp_mail_headers', true ) ?: '';
+		$body_tmpl   = get_post_meta( $form_id, '_pwp_mail_body', true ) ?: '[_all_fields]';
+		$attachments_tmpl = get_post_meta( $form_id, '_pwp_mail_attachments', true ) ?: '';
 
-        // Prepare Dynamic Data
-        $site_name = get_bloginfo( 'name' );
-        $form_title = get_the_title( $form_id );
-        
-        // 1. Prepare Data Replacements (for subject)
-        $replacements = [
-            '{site_name}' => $site_name,
-            '{form_title}' => $form_title
-        ];
-        foreach ( $data as $key => $val ) {
-            if ( is_string( $val ) ) {
-                $replacements["{{$key}}"] = $val;
-            }
-        }
+		// 2. Parse Tags
+		$subject = self::parse_mail_tags( $subject_tmpl, $data, $form_id );
+		$body    = self::parse_mail_tags( $body_tmpl, $data, $form_id );
+		$headers_parsed = self::parse_mail_tags( $headers_tmpl, $data, $form_id );
+		$from_parsed    = self::parse_mail_tags( $from_header, $data, $form_id );
+		
+		// 3. Construct Headers
+		$headers = [ 'Content-Type: text/html; charset=UTF-8' ];
+		$headers[] = 'From: ' . $from_parsed;
 
-        // Subject Replacement
-        $subject = strtr( $subject_tmpl, $replacements );
+		if ( ! empty( $headers_parsed ) ) {
+			$lines = explode( "\n", $headers_parsed );
+			foreach ( $lines as $line ) {
+				$line = trim( $line );
+				if ( ! empty( $line ) ) {
+					$headers[] = $line;
+				}
+			}
+		}
 
-        // 2. Build Data Table (The {body})
-        $table_html = '<table border="1" cellpadding="5" cellspacing="0" style="border-collapse:collapse; width:100%;">';
-        foreach ( $data as $key => $val ) {
-            $label = ucfirst( str_replace( '_', ' ', $key ) );
-            $value = is_array( $val ) ? implode( ', ', $val ) : nl2br( esc_html( $val ) );
-            $table_html .= "<tr><td style='background:#f9f9f9; width:30%;'><strong>$label</strong></td><td>$value</td></tr>";
-        }
-        $table_html .= '</table>';
-        $table_html .= '<p><small>Submission ID: ' . $submission_id . '</small></p>';
+		// 4. Attachments (Future: handle [file] tags mapping to actual paths)
+		// For now simple pass-through of $files if user logic handled it, but here we just pass $files arg 
+		// from submission if it was populated.
+		
+		// 5. Send Mail 1
+		$recipients = explode( ',', self::parse_mail_tags( $to, $data, $form_id ) );
+		foreach ( $recipients as $recipient ) {
+			wp_mail( trim( $recipient ), $subject, nl2br( $body ), $headers, $files );
+		}
+		
+		// Note: Mail 2 (User Confirmation) is typically a separate tab in CF7. 
+		// For now, we will assume Mail 1 is the primary notification.
+		// If the user wants an auto-responder, they would typically configure Mail 2. 
+		// Since we didn't explicitly build "Mail 2" UI yet (just one Mail tab), we'll skip separate user email for now 
+		// UNLESS we want to support the old "User Template" logic? 
+		// The prompt said "move completely to that Individual A form". 
+		// So we strictly follow the new "Mail" tab config. 
+		// If the user sets "To: [your-email]", it acts as an autoresponder. 
+		// Often people want BOTH admin notification AND user receipt. 
+		// CF7 solves this with "Mail 2". 
+		// For MVP of this refactor, we just send "Mail". 
+	}
 
-        // 3. Admin Email Construction
-        $admin_template = get_option( 'pwp_email_template_admin', '' );
-        if ( empty( $admin_template ) ) {
-            $admin_content = "<h1>New Submission</h1><p>You have received a new form submission:</p>{body}";
-        } else {
-            $admin_content = $admin_template;
-        }
+	/**
+	 * Parse Mail Tags
+	 * Replaces [field] with data value.
+	 */
+	public static function parse_mail_tags( $content, $data, $form_id ) {
+		// Special Tags
+		$replacements = [
+			'[_site_title]'       => get_bloginfo( 'name' ),
+			'[_site_url]'         => home_url(),
+			'[_site_admin_email]' => get_option( 'admin_email' ),
+			'[_date]'             => date_i18n( get_option( 'date_format' ) ),
+			'[_time]'             => date_i18n( get_option( 'time_format' ) ),
+			'[_remote_ip]'        => $_SERVER['REMOTE_ADDR'],
+			'[_url]'              => get_permalink( $form_id ), // or referer
+		];
+		
+		// Field Tags
+		foreach ( $data as $key => $val ) {
+			if ( is_array( $val ) ) {
+				$val = implode( ', ', $val );
+			}
+			$replacements["[$key]"] = $val;
+		}
 
-        // Replace Placeholders in Admin Body
-        $admin_content = str_replace( '{body}', $table_html, $admin_content );
-        $admin_content = str_replace( '{site_name}', $site_name, $admin_content );
-        $admin_content = str_replace( '{form_title}', $form_title, $admin_content );
-        
-        // WRAP with Visual Template
-        $admin_final_html = self::get_styled_email_html( "New Submission", $admin_content );
+		// [_all_fields] Helper
+		if ( strpos( $content, '[_all_fields]' ) !== false ) {
+			$table = "<table border='1' cellspacing='0' cellpadding='5' style='border-collapse:collapse; width:100%;'>";
+			foreach ( $data as $key => $val ) {
+				$label = ucfirst( str_replace( '_', ' ', $key ) );
+				$v = is_array( $val ) ? implode( ', ', $val ) : esc_html( $val );
+				$table .= "<tr><td style='background:#f9f9f9; width:30%;'><strong>$label</strong></td><td>$v</td></tr>";
+			}
+			$table .= "</table>";
+			$replacements['[_all_fields]'] = $table;
+		}
 
-        // Headers
-        $headers = [ 'Content-Type: text/html; charset=UTF-8' ];
-        
-        // Custom From Header
-        $from_name = get_option( 'pwp_from_name', get_bloginfo( 'name' ) );
-        $from_email = get_option( 'pwp_from_email', get_option( 'admin_email' ) );
-        $headers[] = "From: $from_name <$from_email>";
-
-        // Admin Headers (Reply-to: User)
-        $admin_headers = $headers;
-        if ( ! empty( $data['email'] ) && is_email( $data['email'] ) ) {
-            $admin_headers[] = 'Reply-To: ' . sanitize_email( $data['email'] );
-        }
-
-        // Send Admin Email
-        $admin_emails = explode( ',', $admin_emails_str );
-        foreach ( $admin_emails as $to ) {
-            wp_mail( trim( $to ), $subject, $admin_final_html, $admin_headers, $files );
-        }
-
-        // 4. Send User Confirmation
-        if ( ! empty( $data['email'] ) && is_email( $data['email'] ) ) {
-            $user_template = get_option( 'pwp_email_template_user', '' );
-            if ( empty( $user_template ) ) {
-                $user_content = "<h1>Thank you!</h1><p>We have received your submission.</p>{body}<p>Best Regards,<br>$site_name</p>";
-            } else {
-                $user_content = $user_template;
-            }
-
-            // Replace Placeholders
-            $user_content = str_replace( '{body}', $table_html, $user_content );
-            $user_content = str_replace( '{site_name}', $site_name, $user_content );
-            $user_content = str_replace( '{form_title}', $form_title, $user_content );
-
-            // WRAP with Visual Template
-            $user_final_html = self::get_styled_email_html( "Submission Received", $user_content );
-
-            $user_subject = "Confirmation: $subject";
-            
-            // User Headers (Reply-to: Support)
-            $user_headers = $headers;
-            $user_headers[] = "Reply-To: $from_email";
-
-            wp_mail( $data['email'], $user_subject, $user_final_html, $user_headers );
-        }
-    }
+		return strtr( $content, $replacements );
+	}
 
     /**
      * Generate Styled Email HTML Wrapper
