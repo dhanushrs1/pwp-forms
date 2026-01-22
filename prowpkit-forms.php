@@ -1,11 +1,12 @@
 <?php
 /**
- * Plugin Name: ProWPKit Forms
- * Plugin URI: https://prowpkit.com
- * Description: A developer-first, secure, and professional form builder for Pro WP Kit.
+ * Plugin Name: PWP Forms
+ * Plugin URI: https://prowpkit.com/
+ * Description: A developer-first, secure, and professional form builder for WordPress.
  * Version: 1.1.0
- * Author: Pro WP Kit Team
- * Text Domain: prowpkit-forms
+ * Author: ProWPKit Team
+ * Author URI: https://prowpkit.com/
+ * Text Domain: pwp-forms
  * Requires PHP: 8.0
  */
 
@@ -22,7 +23,7 @@ define( 'PWP_FORMS_URL', plugin_dir_url( __FILE__ ) );
 require_once PWP_FORMS_PATH . 'includes/class-prowpkit-forms.php';
 
 /**
- * Main Instance of ProWPKit Forms
+ * Main Instance of PWP Forms
  */
 function pwp_forms() {
 	return ProWPKit_Forms::get_instance();

@@ -1,4 +1,4 @@
-# ProWPKit Forms
+# PWP Forms
 
 ![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)
 ![WordPress](https://img.shields.io/badge/WordPress-6.0%2B-blue.svg)
@@ -6,18 +6,21 @@
 
 A **secure**, **cache-compatible** WordPress form builder plugin. Write custom HTML forms while we handle security, spam protection, and email notifications automatically.
 
+📘 **Developer Documentation**: [DEVELOPER.md](DEVELOPER.md) | 🌐 **Website**: [ProWPKit.com](https://prowpkit.com/)
+
 ---
 
 ## ✨ Features
 
 - ⚡ **Raw HTML Forms** - Full control over your form design
 - 🔒 **Built-in Security** - Nonce checks, honeypot, captcha, rate limiting
-- 📧 **Professional Emails** - Branded HTML templates with custom styling
+- � **Secure File Vault** - Protected uploads with role-based access control
+- �📧 **Professional Emails** - Branded HTML templates with custom styling
 - 🛡️ **Anti-Spam** - Cloudflare Turnstile, reCAPTCHA, IP rate limiting
 - 📊 **Admin Dashboard** - Manage submissions with filters and search
 - 💾 **Cache Compatible** - Works with all caching plugins and CDNs
 - 🎨 **Customizable** - Full CSS control and email template customization
-- 📁 **File Uploads** - Secure uploads with type validation
+- 📁 **File Uploads** - Secure uploads with type validation and ownership checks
 
 ---
 
@@ -28,11 +31,11 @@ A **secure**, **cache-compatible** WordPress form builder plugin. Write custom H
 1. Download the plugin
 2. Upload to `/wp-content/plugins/pwp-forms/`
 3. Activate via **WordPress Admin → Plugins**
-4. Go to **Pro Forms** to create your first form
+4. Go to **PWP Forms** to create your first form
 
 ### Create a Form
 
-1. Navigate to **Pro Forms → Add New Form**
+1. Navigate to **PWP Forms → Add New Form**
 2. Add your HTML in the Form tab:
 
 ```html
@@ -100,7 +103,7 @@ Configure in the **Mail** tab:
 
 ### Email Styling
 
-Customize in **Pro Forms → Settings → Email Templates**:
+Customize in **PWP Forms → Settings → Email Templates**:
 
 - Logo URL
 - Color palette (background, container, text, accent)
@@ -111,7 +114,7 @@ All emails (automated + admin replies) use these settings.
 
 ### Managing Submissions
 
-Go to **Pro Forms → Submissions** to:
+Go to **PWP Forms → Submissions** to:
 
 **Filter by:**
 
@@ -134,7 +137,7 @@ Go to **Pro Forms → Submissions** to:
 
 ### Anti-Spam Settings
 
-Configure in **Pro Forms → Settings → General**:
+Configure in **PWP Forms → Settings → General**:
 
 **Captcha Options:**
 
@@ -188,9 +191,18 @@ The plugin includes minimal styling. Add custom CSS in your theme:
 
 ## 📝 Changelog
 
-### Version 1.1.0 (Current Release)
+### Version 1.1.0 (Current Release - 2026-01-22)
 
-**Security Improvements:**
+**🔐 Major Security Enhancements:**
+
+- ✅ **Secure File Vault** - Files now upload to protected `/pwp-secured/` directory
+- ✅ **Access Control** - `.htaccess` blocks all direct file access (403 Forbidden)
+- ✅ **Role-Based Viewers** - Admins can view all files, users only their own
+- ✅ **Ownership Verification** - Critical security checks prevent unauthorized access
+- ✅ **Output Buffer Protection** - Prevents file corruption from stray output
+- ✅ **Proper MIME Types** - Ensures correct file type headers for downloads
+
+**🔒 Additional Security Improvements:**
 
 - Fixed PII leak on cached pages
 - Fixed nonce expiry issues
@@ -198,19 +210,58 @@ The plugin includes minimal styling. Add custom CSS in your theme:
 - Safe file deletion with usage checks
 - Admin replies use HTML templates
 
-**Performance:**
+**⚡ Performance:**
 
 - Full caching compatibility (CDN, page cache)
 - Dynamic data loading via JavaScript
 - Reduced server processing
 
-**New Features:**
+**🆕 New Features:**
 
 - Client-side user data population
 - Fresh nonce fetching on page load
 - Customizable rate limits via filter
+- Nginx configuration support for file protection
 
-[View Full Changelog](readme.txt)
+---
+
+### Version 1.0.2 (2025-12-20)
+
+**Form Builder Improvements:**
+
+- Implemented horizontally scrollable toolbar for better accessibility
+- Updated field snippets to include placeholders and human-readable values
+- Replaced manual submit button with automatic, mandatory submit button
+
+**Email & Notifications:**
+
+- Added visual color swatches for color picker values in emails
+
+**Submission Management:**
+
+- Standardized default submission status to 'New'
+- Added 'Closed' status for better workflow management
+- Fixed status display issues in dashboard
+
+---
+
+### Version 1.0.1 (2025-12-18)
+
+**Security Fixes:**
+
+- Fixed critical vulnerability in `delete_user_data` to restrict file deletion to `wp-content/uploads` directory only
+- Enforced strict MIME type checking for file uploads against internal whitelist
+
+**Bug Fixes:**
+
+- Fixed handling of multi-file uploads (e.g., `<input name="files[]">`)
+- Improved `$_FILES` array normalization to correctly handle both single and array uploads
+
+---
+
+### Version 1.0.0 (2025-12-15)
+
+- Initial release
 
 ---
 
@@ -219,6 +270,7 @@ The plugin includes minimal styling. Add custom CSS in your theme:
 - WordPress 6.0+
 - PHP 8.0+
 - HTTPS recommended
+- Apache with mod_rewrite or Nginx (see [DEVELOPER.md](DEVELOPER.md) for Nginx configuration)
 
 ---
 
@@ -231,6 +283,7 @@ We welcome contributions! See [DEVELOPER.md](DEVELOPER.md) for technical documen
 - Hooks & Filters documentation
 - AJAX endpoints
 - Database schema
+- Secure file handling architecture
 - Customization examples
 
 ---
@@ -244,6 +297,7 @@ GPLv2 or later. See [LICENSE](LICENSE) for details.
 ## 💬 Support
 
 - **Documentation:** [DEVELOPER.md](DEVELOPER.md) for technical docs
+- **Website:** [ProWPKit.com](https://prowpkit.com/)
 - **Issues:** [GitHub Issues](https://github.com/dhanushrs1/pwp-forms/issues)
 - **Community:** [WordPress Support Forum](https://wordpress.org/support/plugin/pwp-forms/)
 
@@ -262,4 +316,4 @@ GPLv2 or later. See [LICENSE](LICENSE) for details.
 
 ---
 
-**Made with ❤️ by the ProWPKit Team** | [Website](https://prowpkit.com) | [GitHub](https://github.com/dhanushrs1)
+**Made with ❤️ by the ProWPKit Team** | [Website](https://prowpkit.com/) | [GitHub](https://github.com/dhanushrs1)

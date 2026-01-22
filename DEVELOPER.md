@@ -1,12 +1,15 @@
-# Developer Documentation
+# Developer Documentation - PWP Forms
 
-Technical documentation for extending and customizing ProWPKit Forms.
+Technical documentation for extending and customizing PWP Forms.
+
+📘 **User Guide**: [README.md](README.md) | 🌐 **Website**: [ProWPKit.com](https://prowpkit.com/)
 
 ---
 
 ## 📚 Table of Contents
 
 - [Architecture Overview](#architecture-overview)
+- [Secure File Handling](#secure-file-handling)
 - [Hooks & Filters](#hooks--filters)
 - [AJAX Endpoints](#ajax-endpoints)
 - [Database Schema](#database-schema)
@@ -27,8 +30,8 @@ Located in `/includes/`:
 4. **class-form-render.php** - Frontend shortcode rendering
 5. **class-form-submit.php** - AJAX submission handler
 6. **class-email-manager.php** - Email notifications
-7. **class-upload-handler.php** - File upload security
-8. **class-admin-dashboard.php** - Submissions management
+7. **class-upload-handler.php** - Secure file vault system
+8. **class-admin-dashboard.php** - Submissions management & admin file viewer
 9. **class-submissions-list.php** - WP_List_Table implementation
 10. **class-settings.php** - Global settings pages
 
@@ -54,6 +57,86 @@ Database insert (wp_pwp_submissions)
 Email notifications (class-email-manager.php)
     ↓
 JSON response to frontend
+```
+
+---
+
+## 🔐 Secure File Handling
+
+### Architecture: The Secure Vault
+
+PWP Forms implements a "Secure Vault" architecture for file uploads to protect sensitive user data.
+
+#### How It Works
+
+1. **Separate Directory**: Files upload to `/wp-content/uploads/pwp-secured/` instead of public directories
+2. **Web Server Block**: `.htaccess` file with `Deny from all` prevents direct URL access
+3. **Role-Based Viewers**: PHP scripts act as "tunnels" with permission checks
+
+#### Upload Process
+
+```php
+// class-upload-handler.php
+$secure_upload_filter = function( $param ) {
+    $mydir = '/pwp-secured';
+    $param['path'] = $param['basedir'] . $mydir;
+    $param['url']  = $param['baseurl'] . $mydir;
+    $param['subdir'] = $mydir;
+    return $param;
+};
+
+add_filter( 'upload_dir', $secure_upload_filter );
+$movefile = wp_handle_upload( $file_array, $upload_overrides );
+remove_filter( 'upload_dir', $secure_upload_filter );
+
+// Create .htaccess protection
+$htaccess_content = "Order Deny,Allow\nDeny from all";
+file_put_contents( $secure_dir . '/.htaccess', $htaccess_content );
+```
+
+#### File Viewing
+
+**Admin Viewer** (`admin_post_pwp_view_file`):
+
+- Checks `current_user_can('manage_options')`
+- Can view any uploaded file
+- Located in `class-admin-dashboard.php::handle_file_view()`
+
+**User Viewer** (`admin_post_pwp_view_my_file`):
+
+- Checks `is_user_logged_in()`
+- Verifies ownership: `$submission->user_id === get_current_user_id()`
+- Located in `class-form-render.php::handle_user_file_view()`
+
+#### Security Features
+
+| Protection                 | Implementation                                |
+| -------------------------- | --------------------------------------------- |
+| **Directory Isolation**    | `/pwp-secured/` folder                        |
+| **Direct Access Block**    | `.htaccess` returns 403 Forbidden             |
+| **Admin Permission**       | `manage_options` capability check             |
+| **Ownership Verification** | User ID matching on submissions               |
+| **Nonce Validation**       | `wp_verify_nonce()` on all viewers            |
+| **Output Buffer Cleaning** | `ob_end_clean()` prevents corruption          |
+| **MIME Type Validation**   | `wp_check_filetype()` ensures correct headers |
+
+#### Nginx Configuration
+
+For Nginx servers, add this to your server block:
+
+```nginx
+# PWP Forms - Secure File Vault
+location ~* /wp-content/uploads/pwp-secured/ {
+    deny all;
+    return 403;
+}
+```
+
+Then restart Nginx:
+
+```bash
+sudo nginx -t
+sudo systemctl restart nginx
 ```
 
 ---
@@ -440,6 +523,21 @@ add_action( 'pwp_before_submission_save', function( $data, $form_id ) {
 3. **Escape outputs** with `esc_html()`, `esc_attr()`, `esc_url()`
 4. **Check capabilities** with `current_user_can()`
 
+### For File Handling
+
+1. **Never expose file paths** directly in HTML
+2. **Use secure viewer endpoints** with nonce validation
+3. **Verify ownership** before serving user files
+4. **Clean output buffers** before `readfile()` to prevent corruption
+
+```php
+// GOOD: Secure file viewing
+$viewer_url = admin_url( 'admin-post.php?action=pwp_view_file&id=' . $id . '&index=' . $index . '&_wpnonce=' . wp_create_nonce( 'pwp_view_file' ) );
+
+// BAD: Direct file URL (publicly accessible)
+$file_url = $upload_dir['baseurl'] . '/pwp-secured/file.pdf';
+```
+
 ---
 
 ## 🧪 Testing
@@ -457,12 +555,19 @@ add_action( 'pwp_before_submission_save', function( $data, $form_id ) {
    - 11th submission should be blocked
    - Wait 1 hour, should work again
 
-3. **File Upload:**
+3. **Secure File Upload:**
+   - Upload a file through the form
+   - Try accessing directly: `https://yoursite.com/wp-content/uploads/pwp-secured/file.pdf`
+   - Expected: 403 Forbidden error
+   - Admin should be able to view via secure viewer
+   - User should only view their own files
+
+4. **File Upload as Guest:**
    - Test as guest (should be locked)
    - Test as logged-in user (should work)
    - Verify MIME type validation
 
-4. **GDPR Deletion:**
+5. **GDPR Deletion:**
    - Create submissions with file uploads
    - Use Privacy Tools to delete by email
    - Verify database and files removed
@@ -514,6 +619,7 @@ add_action( 'pwp_before_submission_save', function( $data, $form_id ) {
 - [WordPress Coding Standards](https://developer.wordpress.org/coding-standards/)
 - [WP_List_Table Documentation](https://developer.wordpress.org/reference/classes/wp_list_table/)
 - [Settings API](https://developer.wordpress.org/plugins/settings/settings-api/)
+- [ProWPKit Website](https://prowpkit.com/)
 
 ---
 
@@ -558,6 +664,14 @@ Check logs in `wp-content/debug.log`
 - Verify directory permissions
 - Check MIME type whitelist
 
+**Files not viewable:**
+
+- Verify `.htaccess` exists in `/pwp-secured/`
+- Check file ownership in database
+- Verify nonce in viewer URL
+
 ---
 
 **Questions?** [Open an issue](https://github.com/dhanushrs1/pwp-forms/issues) or [start a discussion](https://github.com/dhanushrs1/pwp-forms/discussions)
+
+**Made with ❤️ by the ProWPKit Team** | [Website](https://prowpkit.com/) | [GitHub](https://github.com/dhanushrs1)

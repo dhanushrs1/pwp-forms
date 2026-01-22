@@ -15,6 +15,10 @@ class PWP_Form_Render {
 		add_action( 'wp_ajax_nopriv_pwp_get_form_nonce', [ $this, 'ajax_get_nonce' ] );
 		add_action( 'wp_ajax_pwp_get_user_data', [ $this, 'ajax_get_user_data' ] );
 		add_action( 'wp_ajax_nopriv_pwp_get_user_data', [ $this, 'ajax_get_user_data' ] );
+		
+		// SECURITY: Secure file viewer for logged-in users (own files only)
+		add_action( 'admin_post_pwp_view_my_file', [ $this, 'handle_user_file_view' ] );
+		add_action( 'admin_post_nopriv_pwp_view_my_file', [ $this, 'handle_user_file_view' ] );
 	}
 
 	/**
@@ -175,5 +179,64 @@ class PWP_Form_Render {
 				'logged_in' => false
 			] );
 		}
+	}
+
+	/**
+	 * SECURITY: User File Viewer (Secure Vault Access)
+	 * Allows users to view ONLY their own uploaded files
+	 */
+	public function handle_user_file_view() {
+		// 1. Permission Check: Must be Logged In
+		if ( ! is_user_logged_in() ) {
+			wp_die( 'Please log in to access this file.', 'Unauthorized', [ 'response' => 403 ] );
+		}
+		
+		if ( ! isset( $_GET['_wpnonce'] ) || ! wp_verify_nonce( $_GET['_wpnonce'], 'pwp_view_my_file' ) ) {
+			wp_die( 'Security check failed.', 'Forbidden', [ 'response' => 403 ] );
+		}
+
+		$id = intval( $_GET['id'] ?? 0 );
+		$index = intval( $_GET['index'] ?? 0 );
+
+		if ( ! $id ) {
+			wp_die( 'Invalid submission ID.' );
+		}
+
+		// 2. Fetch Submission and Verify Ownership
+		global $wpdb;
+		$table = $wpdb->prefix . 'pwp_submissions';
+		$row = $wpdb->get_row( $wpdb->prepare( "SELECT user_id, uploaded_files FROM $table WHERE id = %d", $id ) );
+
+		if ( ! $row ) {
+			wp_die( 'Submission not found.', 'Not Found', [ 'response' => 404 ] );
+		}
+
+		// CRITICAL: Ownership Verification
+		// Users can ONLY view files they uploaded themselves
+		if ( (int) $row->user_id !== get_current_user_id() ) {
+			wp_die( 'You do not have permission to view this file.', 'Forbidden', [ 'response' => 403 ] );
+		}
+
+		// 3. Serve File with Proper Headers
+		$files = json_decode( $row->uploaded_files, true );
+		$file_path = $files[ $index ] ?? false;
+
+		if ( $file_path && file_exists( $file_path ) ) {
+			$file_info = wp_check_filetype( $file_path );
+			$mime_type = $file_info['type'] ?: 'application/octet-stream';
+			
+			// CRITICAL: Clean output buffer to prevent file corruption
+			if ( ob_get_level() ) {
+				ob_end_clean();
+			}
+			
+			header( 'Content-Type: ' . $mime_type );
+			header( 'Content-Length: ' . filesize( $file_path ) );
+			header( 'Content-Disposition: inline; filename="' . basename( $file_path ) . '"' );
+			readfile( $file_path );
+			exit;
+		}
+		
+		wp_die( 'File not found.', 'Not Found', [ 'response' => 404 ] );
 	}
 }

@@ -228,7 +228,7 @@ class PWP_Settings {
 	}
 
 	public function render_footer_field() {
-		$footer = get_option( 'pwp_email_footer', 'Powered by ProWPKit' );
+		$footer = get_option( 'pwp_email_footer', 'Powered by <a href="https://prowpkit.com/">ProWPKit</a>' );
 		?>
 		<textarea name="pwp_email_footer" rows="2" style="width:100%;"><?php echo esc_textarea( $footer ); ?></textarea>
 		<p class="description">Text to verify at the bottom of the email.</p>
@@ -335,7 +335,7 @@ class PWP_Settings {
 
 		?>
 		<div class="wrap">
-			<h1>ProWPKit Forms Settings</h1>
+			<h1>PWP Forms Settings</h1>
 			
 			<?php $this->render_tabs( $active_tab ); ?>
 
@@ -352,7 +352,7 @@ class PWP_Settings {
 					$container_bg = get_option( 'pwp_email_container_bg', '#ffffff' );
 					$text_color = get_option( 'pwp_email_text_color', '#333333' );
 					$accent_color = get_option( 'pwp_email_accent_color', '#0073aa' );
-					$footer = get_option( 'pwp_email_footer', 'Powered by ProWPKit' );
+					$footer = get_option( 'pwp_email_footer', 'Powered by <a href="https://prowpkit.com/">ProWPKit</a>' );
 					
 					$from_name = get_option( 'pwp_from_name', get_bloginfo( 'name' ) );
 					$from_email = get_option( 'pwp_from_email', get_option( 'admin_email' ) );

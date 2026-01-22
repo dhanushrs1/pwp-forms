@@ -125,7 +125,7 @@ class PWP_Email_Manager {
         $accent_color = get_option( 'pwp_email_accent_color', '#0073aa' );
         $font_family = get_option( 'pwp_email_font_family', 'Helvetica, Arial, sans-serif' );
         $font_size = get_option( 'pwp_email_font_size', '16' );
-        $footer_text = get_option( 'pwp_email_footer', 'Powered by ProWPKit' );
+        $footer_text = get_option( 'pwp_email_footer', 'Powered by <a href="https://prowpkit.com/">ProWPKit</a>' );
 
         // Replace Line Breaks in Footer
         $footer_html = nl2br( esc_html( $footer_text ) );

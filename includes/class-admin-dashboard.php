@@ -10,6 +10,8 @@ class PWP_Admin_Dashboard {
 		add_action( 'admin_menu', [ $this, 'add_admin_menu' ] );
 		add_action( 'admin_init', [ $this, 'handle_actions' ] );
 		add_filter( 'set-screen-option', [ $this, 'set_screen_option' ], 10, 3 );
+		// SECURITY: Secure file viewer for administrators
+		add_action( 'admin_post_pwp_view_file', [ $this, 'handle_file_view' ] );
 	}
 
 	/**
@@ -132,7 +134,7 @@ class PWP_Admin_Dashboard {
 		$action = $_GET['action'] ?? 'list';
 
 		echo '<div class="wrap">';
-		echo '<h1 class="wp-heading-inline">Pro Submissions</h1>';
+		echo '<h1 class="wp-heading-inline">PWP Forms Submissions</h1>';
 
 		if ( isset( $_GET['msg'] ) ) {
 			echo '<div class="notice notice-success is-dismissible"><p>Action completed successfully.</p></div>';
@@ -219,18 +221,18 @@ class PWP_Admin_Dashboard {
 							</table>
 
 							<?php if ( ! empty( $files ) ) : ?>
-								<h3>Values Attached</h3>
+								<h3>Uploaded Files</h3>
 								<div style="background:#f9f9f9; padding:10px; border:1px solid #ddd;">
-									<?php foreach ( $files as $file_path ) : 
-										$upload_dir = wp_upload_dir();
-										$file_url = str_replace( $upload_dir['basedir'], $upload_dir['baseurl'], $file_path );
+									<?php foreach ( $files as $file_index => $file_path ) : 
+										// SECURITY: Use secure viewer endpoint instead of direct file URL
+										$viewer_url = admin_url( 'admin-post.php?action=pwp_view_file&id=' . $row->id . '&index=' . $file_index . '&_wpnonce=' . wp_create_nonce( 'pwp_view_file' ) );
 									?>
 										<p>
 											<span class="dashicons dashicons-paperclip"></span>
-											<a href="<?php echo esc_url( $file_url ); ?>" target="_blank" style="font-weight:bold;">
+											<a href="<?php echo esc_url( $viewer_url ); ?>" target="_blank" style="font-weight:bold;">
 												<?php echo basename( $file_path ); ?>
 											</a>
-											<small>(<?php echo size_format( filesize( $file_path ) ); ?>)</small>
+											<small>(<?php echo file_exists( $file_path ) ? size_format( filesize( $file_path ) ) : 'File not found'; ?>)</small>
 										</p>
 									<?php endforeach; ?>
 								</div>
@@ -295,6 +297,59 @@ class PWP_Admin_Dashboard {
 			</div>
 		</div>
 		<?php
+	}
+
+	/**
+	 * SECURITY: Admin File Viewer (Secure Vault Access)
+	 * Allows administrators to view any uploaded file
+	 */
+	public function handle_file_view() {
+		// 1. Permission Check: Admin Only
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( 'Unauthorized access.', 'Forbidden', [ 'response' => 403 ] );
+		}
+		
+		if ( ! isset( $_GET['_wpnonce'] ) || ! wp_verify_nonce( $_GET['_wpnonce'], 'pwp_view_file' ) ) {
+			wp_die( 'Security check failed.', 'Forbidden', [ 'response' => 403 ] );
+		}
+
+		$id = intval( $_GET['id'] ?? 0 );
+		$index = intval( $_GET['index'] ?? 0 );
+
+		if ( ! $id ) {
+			wp_die( 'Invalid submission ID.' );
+		}
+
+		// 2. Fetch File Path from Database
+		global $wpdb;
+		$table = $wpdb->prefix . 'pwp_submissions';
+		$row = $wpdb->get_row( $wpdb->prepare( "SELECT uploaded_files FROM $table WHERE id = %d", $id ) );
+		
+		if ( ! $row ) {
+			wp_die( 'Submission not found.' );
+		}
+		
+		$files = json_decode( $row->uploaded_files, true );
+		$file_path = $files[ $index ] ?? false;
+
+		// 3. Serve File with Proper Headers
+		if ( $file_path && file_exists( $file_path ) ) {
+			$file_info = wp_check_filetype( $file_path );
+			$mime_type = $file_info['type'] ?: 'application/octet-stream';
+			
+			// CRITICAL: Clean output buffer to prevent file corruption
+			if ( ob_get_level() ) {
+				ob_end_clean();
+			}
+			
+			header( 'Content-Type: ' . $mime_type );
+			header( 'Content-Length: ' . filesize( $file_path ) );
+			header( 'Content-Disposition: inline; filename="' . basename( $file_path ) . '"' );
+			readfile( $file_path );
+			exit;
+		}
+		
+		wp_die( 'File not found.' );
 	}
 
 	/**

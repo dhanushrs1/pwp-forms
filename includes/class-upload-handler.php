@@ -11,7 +11,7 @@ class PWP_Upload_Handler {
 	 * 
 	 * @param array $files $_FILES array
 	 * @param int $form_id Form ID
-	 * @return array|WP_Error Array of file URLs/Paths or Error
+	 * @return array|WP_Error Array of file paths or Error
 	 */
 	public static function handle_uploads( $files, $form_id ) {
 		if ( ! function_exists( 'wp_handle_upload' ) ) {
@@ -42,6 +42,15 @@ class PWP_Upload_Handler {
 		$max_size_mb = get_option( 'pwp_max_upload_size', '5' );
 		$max_size_bytes = intval( $max_size_mb ) * 1024 * 1024;
 
+		// --- SECURITY: Filter to redirect uploads to secure vault directory ---
+		$secure_upload_filter = function( $param ) {
+			$mydir = '/pwp-secured';
+			$param['path'] = $param['basedir'] . $mydir;
+			$param['url']  = $param['baseurl'] . $mydir;
+			$param['subdir'] = $mydir;
+			return $param;
+		};
+
 		foreach ( $normalized_files as $file_array ) {
 			if ( $file_array['error'] !== UPLOAD_ERR_OK ) {
 				continue; 
@@ -69,10 +78,32 @@ class PWP_Upload_Handler {
 				return new WP_Error( 'invalid_type', "File type $ext is not allowed for file {$file_array['name']}." );
 			}
 
-			// 3. Handle Upload
+			// 3. Apply secure directory filter and handle upload
+			add_filter( 'upload_dir', $secure_upload_filter );
 			$movefile = wp_handle_upload( $file_array, $upload_overrides );
+			remove_filter( 'upload_dir', $secure_upload_filter );
 
 			if ( $movefile && ! isset( $movefile['error'] ) ) {
+				// 4. SECURITY: Create .htaccess to block all public web access
+				$secure_dir = dirname( $movefile['file'] );
+				$htaccess_file = $secure_dir . '/.htaccess';
+				
+				if ( ! file_exists( $htaccess_file ) ) {
+					// Deny all direct web access - only PHP scripts can read these files
+					$htaccess_content = "# PWP Forms - Secure File Vault\n";
+					$htaccess_content .= "# This directory is protected from public access\n";
+					$htaccess_content .= "Order Deny,Allow\n";
+					$htaccess_content .= "Deny from all\n\n";
+					$htaccess_content .= "# Note for Nginx users:\n";
+					$htaccess_content .= "# Add this to your server block configuration:\n";
+					$htaccess_content .= "# location ~* /wp-content/uploads/pwp-secured/ {\n";
+					$htaccess_content .= "#     deny all;\n";
+					$htaccess_content .= "#     return 403;\n";
+					$htaccess_content .= "# }\n";
+					
+					file_put_contents( $htaccess_file, $htaccess_content );
+				}
+				
 				$uploaded_files[] = $movefile['file'];
 			} else {
 				return new WP_Error( 'upload_error', $movefile['error'] );
