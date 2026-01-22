@@ -1,6 +1,6 @@
 # PWP Forms
 
-![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)
+![Version](https://img.shields.io/badge/version-1.1.1-blue.svg)
 ![WordPress](https://img.shields.io/badge/WordPress-6.0%2B-blue.svg)
 ![License](https://img.shields.io/badge/license-GPLv2%2B-green.svg)
 
@@ -191,7 +191,20 @@ The plugin includes minimal styling. Add custom CSS in your theme:
 
 ## 📝 Changelog
 
-### Version 1.1.0 (Current Release - 2026-01-22)
+### Version 1.1.1 (Current Release - 2026-01-22)
+
+**🔒 Security Fix (Critical):**
+
+- ✅ **SQL Injection Protection** - Fixed critical SQL injection vulnerability in submissions search
+- ✅ **WordPress.org Compliance** - Replaced `esc_sql()` with `$wpdb->prepare()` statements
+- ✅ **Proper Escaping** - Implemented `$wpdb->esc_like()` for LIKE query wildcards
+- ✅ **Code Quality** - Meets WordPress.org plugin directory security standards
+
+**Recommendation:** Immediate update recommended for all users.
+
+---
+
+### Version 1.1.0 (2026-01-22)
 
 **🔐 Major Security Enhancements:**
 

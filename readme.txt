@@ -5,7 +5,7 @@ Tags: form, contact form, forms, email, spam
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 8.0
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -179,6 +179,14 @@ Yes! The plugin provides minimal base styling. Add your custom CSS in your theme
 
 == Changelog ==
 
+= 1.1.1 - 2026-01-22 =
+
+**Security Fix (Critical):**
+* Fixed SQL injection vulnerability in submissions search functionality
+* Replaced `esc_sql()` string concatenation with proper `$wpdb->prepare()` statements
+* Implemented `$wpdb->esc_like()` for LIKE query wildcards
+* WordPress.org security compliance - ready for plugin directory submission
+
 = 1.1.0 - 2026-01-22 =
 
 **Major Security Enhancements:**
@@ -223,6 +231,9 @@ Yes! The plugin provides minimal base styling. Add your custom CSS in your theme
 * Honeypot spam protection
 
 == Upgrade Notice ==
+
+= 1.1.1 =
+Critical security update! Fixed SQL injection vulnerability in search functionality. Immediate update recommended for all users.
 
 = 1.1.0 =
 Major security update! Files now upload to protected directory. Existing uploads remain in their current location. New uploads will be secured. Highly recommended update for all users handling sensitive data.

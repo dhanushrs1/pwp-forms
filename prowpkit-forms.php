@@ -3,7 +3,7 @@
  * Plugin Name: PWP Forms
  * Plugin URI: https://prowpkit.com/
  * Description: A developer-first, secure, and professional form builder for WordPress.
- * Version: 1.1.0
+ * Version: 1.1.1
  * Author: ProWPKit Team
  * Author URI: https://prowpkit.com/
  * Text Domain: pwp-forms
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define Constants
-define( 'PWP_FORMS_VERSION', '1.1.0' );
+define( 'PWP_FORMS_VERSION', '1.1.1' );
 define( 'PWP_FORMS_PATH', plugin_dir_path( __FILE__ ) );
 define( 'PWP_FORMS_URL', plugin_dir_url( __FILE__ ) );
 

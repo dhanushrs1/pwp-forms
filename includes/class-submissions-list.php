@@ -139,9 +139,17 @@ class PWP_Submissions_List_Table extends WP_List_Table {
 		
 		// Search
 		if ( ! empty( $_REQUEST['s'] ) ) {
-			$search = esc_sql( $_REQUEST['s'] );
-			// Enhanced Search: Email OR Data OR Form ID
-			$query .= " AND ( user_email LIKE '%$search%' OR submission_data LIKE '%$search%' OR form_id = '$search' )";
+			// 1. Create the wildcard search term using esc_like for LIKE queries
+			$search_term = '%' . $wpdb->esc_like( $_REQUEST['s'] ) . '%';
+			$search_raw  = $_REQUEST['s'];
+
+			// 2. Use prepare() to safely inject variables - WordPress.org requirement
+			$query .= $wpdb->prepare(
+				" AND ( user_email LIKE %s OR submission_data LIKE %s OR form_id = %s )",
+				$search_term, // For user_email LIKE
+				$search_term, // For submission_data LIKE
+				$search_raw   // For form_id = (exact match)
+			);
 		}
 
 		// Status Filter
