@@ -23,25 +23,27 @@ class PWP_Email_Manager {
 	 * @param array $files Paths
 	 */
 	public static function send_notifications( $submission_id, $form_id, $data, $files = [] ) {
-		// 1. Fetch Form Settings (Meta)
+		// --- 1. MAIL 1 (Admin) SETUP ---
 		$to          = get_post_meta( $form_id, '_pwp_mail_to', true ) ?: get_option( 'admin_email' );
 		$from_header = get_post_meta( $form_id, '_pwp_mail_from', true ) ?: get_bloginfo( 'name' ) . ' <wordpress@' . $_SERVER['HTTP_HOST'] . '>';
 		$subject_tmpl= get_post_meta( $form_id, '_pwp_mail_subject', true ) ?: 'New Submission: [your-subject]';
 		$headers_tmpl= get_post_meta( $form_id, '_pwp_mail_headers', true ) ?: '';
 		$body_tmpl   = get_post_meta( $form_id, '_pwp_mail_body', true ) ?: '[_all_fields]';
-		$attachments_tmpl = get_post_meta( $form_id, '_pwp_mail_attachments', true ) ?: '';
-
-		// 2. Parse Tags
-		$subject = self::parse_mail_tags( $subject_tmpl, $data, $form_id );
-		$body    = self::parse_mail_tags( $body_tmpl, $data, $form_id );
-		$headers_parsed = self::parse_mail_tags( $headers_tmpl, $data, $form_id );
-		$from_parsed    = self::parse_mail_tags( $from_header, $data, $form_id );
 		
-		// 3. Construct Headers
+		// Parse Admin Tags
+		$subject = self::parse_mail_tags( $subject_tmpl, $data, $form_id );
+		$body_raw = self::parse_mail_tags( $body_tmpl, $data, $form_id );
+		
+		// BRANDING: Apply Styled Template
+		$body_styled = self::get_styled_email_html( $subject, nl2br( $body_raw ) );
+
+		// Construct Headers
+		$from_parsed = self::parse_mail_tags( $from_header, $data, $form_id );
 		$headers = [ 'Content-Type: text/html; charset=UTF-8' ];
 		$headers[] = 'From: ' . $from_parsed;
 
-		if ( ! empty( $headers_parsed ) ) {
+		if ( ! empty( $headers_tmpl ) ) {
+			$headers_parsed = self::parse_mail_tags( $headers_tmpl, $data, $form_id );
 			$lines = explode( "\n", $headers_parsed );
 			foreach ( $lines as $line ) {
 				$line = trim( $line );
@@ -51,27 +53,36 @@ class PWP_Email_Manager {
 			}
 		}
 
-		// 4. Attachments (Future: handle [file] tags mapping to actual paths)
-		// For now simple pass-through of $files if user logic handled it, but here we just pass $files arg 
-		// from submission if it was populated.
-		
-		// 5. Send Mail 1
+		// --- SEND MAIL 1 ---
 		$recipients = explode( ',', self::parse_mail_tags( $to, $data, $form_id ) );
 		foreach ( $recipients as $recipient ) {
-			wp_mail( trim( $recipient ), $subject, nl2br( $body ), $headers, $files );
+			wp_mail( trim( $recipient ), $subject, $body_styled, $headers, $files );
 		}
 		
-		// Note: Mail 2 (User Confirmation) is typically a separate tab in CF7. 
-		// For now, we will assume Mail 1 is the primary notification.
-		// If the user wants an auto-responder, they would typically configure Mail 2. 
-		// Since we didn't explicitly build "Mail 2" UI yet (just one Mail tab), we'll skip separate user email for now 
-		// UNLESS we want to support the old "User Template" logic? 
-		// The prompt said "move completely to that Individual A form". 
-		// So we strictly follow the new "Mail" tab config. 
-		// If the user sets "To: [your-email]", it acts as an autoresponder. 
-		// Often people want BOTH admin notification AND user receipt. 
-		// CF7 solves this with "Mail 2". 
-		// For MVP of this refactor, we just send "Mail". 
+		// --- 2. MAIL 2 (User Confirmation) CHECK ---
+		$mail_2_active = get_post_meta( $form_id, '_pwp_mail_2_active', true );
+		
+		if ( ! empty( $mail_2_active ) ) {
+			$to_2_tmpl = get_post_meta( $form_id, '_pwp_mail_2_to', true );
+			$subject_2_tmpl = get_post_meta( $form_id, '_pwp_mail_2_subject', true );
+			$body_2_tmpl = get_post_meta( $form_id, '_pwp_mail_2_body', true );
+
+			// Parse User Tags
+			$to_2 = self::parse_mail_tags( $to_2_tmpl, $data, $form_id );
+			$subject_2 = self::parse_mail_tags( $subject_2_tmpl, $data, $form_id );
+			$body_2_raw = self::parse_mail_tags( $body_2_tmpl, $data, $form_id );
+
+			// BRANDING: Apply Styled Template to User Email
+			$body_2_styled = self::get_styled_email_html( $subject_2, nl2br( $body_2_raw ) );
+
+			// Headers for Mail 2 (From Site Name)
+			$headers_2 = [ 'Content-Type: text/html; charset=UTF-8' ];
+			// Uses the Site Name <admin@site.com> format usually, or the "From" configured in Mail 1
+			$headers_2[] = 'From: ' . $from_parsed; 
+
+			// --- SEND MAIL 2 ---
+			wp_mail( $to_2, $subject_2, $body_2_styled, $headers_2 );
+		}
 	}
 
 	/**

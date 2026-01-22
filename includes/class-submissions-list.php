@@ -205,6 +205,17 @@ class PWP_Submissions_List_Table extends WP_List_Table {
 				<?php $this->render_date_picker(); ?>
 				<?php submit_button( 'Filter', 'secondary', 'filter_action', false ); ?>
 			</div>
+			<div class="alignleft actions" style="margin-left: 10px;">
+				<?php
+				$export_url = wp_nonce_url( 
+					admin_url( 'edit.php?post_type=pwp_form&page=pwp-form-submissions&action=export_csv' ), 
+					'pwp_export_csv' 
+				);
+				?>
+				<a href="<?php echo esc_url( $export_url ); ?>" class="button button-secondary">
+					<span class="dashicons dashicons-download" style="margin-top: 3px;"></span> Export to CSV
+				</a>
+			</div>
 			<?php
 		}
 	}

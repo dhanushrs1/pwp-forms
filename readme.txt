@@ -110,9 +110,10 @@ See the [complete documentation](https://github.com/dhanushrs1/pwp-forms) for de
 = Configuration =
 
 1. Navigate to **PWP Forms → Settings**
-2. Configure email templates, SMTP settings, and anti-spam options
+2. Configure email templates and anti-spam options
 3. Set up Cloudflare Turnstile or reCAPTCHA (optional but recommended)
 4. Customize rate limiting if needed
+5. For reliable email delivery, use a dedicated SMTP plugin like "WP Mail SMTP"
 
 == Frequently Asked Questions ==
 

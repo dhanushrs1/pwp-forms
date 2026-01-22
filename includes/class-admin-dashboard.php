@@ -52,11 +52,18 @@ class PWP_Admin_Dashboard {
 	}
 
 	/**
-	 * Handle POST Actions (Reply, Delete)
+	 * Handle POST Actions (Reply, Delete, Export)
 	 */
 	public function handle_actions() {
 		if ( ! isset( $_REQUEST['page'] ) || $_REQUEST['page'] !== 'pwp-form-submissions' ) {
 			return;
+		}
+
+		// CSV Export
+		if ( isset( $_GET['action'] ) && $_GET['action'] === 'export_csv' ) {
+			check_admin_referer( 'pwp_export_csv' );
+			$this->export_to_csv();
+			exit;
 		}
 
 		// Delete Submission
@@ -297,6 +304,76 @@ class PWP_Admin_Dashboard {
 			</div>
 		</div>
 		<?php
+	}
+
+	/**
+	 * Export Submissions to CSV
+	 */
+	private function export_to_csv() {
+		global $wpdb;
+		$table = $wpdb->prefix . 'pwp_submissions';
+		
+		// Get all submissions (respecting current filters if we want, or all)
+		$query = "SELECT * FROM $table ORDER BY created_at DESC";
+		$submissions = $wpdb->get_results( $query, ARRAY_A );
+		
+		if ( empty( $submissions ) ) {
+			wp_die( 'No submissions to export.' );
+		}
+
+		// Set headers for CSV download
+		header( 'Content-Type: text/csv; charset=utf-8' );
+		header( 'Content-Disposition: attachment; filename="pwp-submissions-' . date( 'Y-m-d-His' ) . '.csv"' );
+		header( 'Pragma: no-cache' );
+		header( 'Expires: 0' );
+
+		// Open output stream
+		$output = fopen( 'php://output', 'w' );
+
+		// Add BOM for Excel UTF-8 compatibility
+		fprintf( $output, chr(0xEF).chr(0xBB).chr(0xBF) );
+
+		// Write header row
+		$header_written = false;
+
+		foreach ( $submissions as $submission ) {
+			// Parse JSON data
+			$data = json_decode( $submission['submission_data'], true );
+			if ( ! is_array( $data ) ) {
+				$data = [];
+			}
+
+			// Build row
+			$row = [
+				'ID' => $submission['id'],
+				'Form ID' => $submission['form_id'],
+				'User Email' => $submission['user_email'],
+				'Status' => $submission['status'],
+				'Created At' => $submission['created_at'],
+				'IP Address' => $submission['user_ip'] ?? '',
+			];
+
+			// Add all form fields
+			foreach ( $data as $key => $value ) {
+				if ( is_array( $value ) ) {
+					$row[$key] = implode( ', ', $value );
+				} else {
+					$row[$key] = $value;
+				}
+			}
+
+			// Write header on first iteration
+			if ( ! $header_written ) {
+				fputcsv( $output, array_keys( $row ) );
+				$header_written = true;
+			}
+
+			// Write data row
+			fputcsv( $output, $row );
+		}
+
+		fclose( $output );
+		exit;
 	}
 
 	/**

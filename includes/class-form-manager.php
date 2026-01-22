@@ -19,9 +19,9 @@ class PWP_Form_Manager {
 	 */
 	public function register_cpt() {
 		$labels = [
-			'name'               => 'ProWPKit Forms',
-			'singular_name'      => 'Form',
-			'menu_name'          => 'Pro Forms',
+			'name'               => 'PWP Forms',
+			'singular_name'      => 'PWP Form',
+			'menu_name'          => 'PWP Forms',
 			'add_new'            => 'Add New Form',
 			'add_new_item'       => 'Add New Form',
 			'edit_item'          => 'Edit Form',
@@ -234,6 +234,33 @@ class PWP_Form_Manager {
 
 		<textarea id="pwp_form_html" name="pwp_form_html" rows="20" style="width:100%; font-family: 'Consolas', 'Monaco', monospace; font-size: 13px; line-height: 1.5; background:#282c34; color:#abb2bf; border:0; padding:15px; border-radius:0 0 4px 4px;" placeholder="<!-- Enter your HTML form fields here -->"><?php echo esc_textarea( $html ); ?></textarea>
 		
+		<?php
+		// DEVELOPER POLISH: Enqueue CodeMirror for Syntax Highlighting
+		$settings = wp_enqueue_code_editor( array( 'type' => 'text/html' ) );
+		
+		if ( $settings !== false ) {
+			// CodeMirror is available, initialize it
+			?>
+			<script type="text/javascript">
+			jQuery(document).ready(function($){
+				// Initialize CodeMirror with WordPress defaults
+				if (typeof wp !== 'undefined' && wp.codeEditor) {
+					var editorSettings = <?php echo wp_json_encode( $settings ); ?>;
+					// Customize settings for better UX
+					editorSettings.codemirror.lineNumbers = true;
+					editorSettings.codemirror.lineWrapping = true;
+					editorSettings.codemirror.indentUnit = 2;
+					editorSettings.codemirror.tabSize = 2;
+					editorSettings.codemirror.mode = 'text/html';
+					
+					var editor = wp.codeEditor.initialize('pwp_form_html', editorSettings);
+				}
+			});
+			</script>
+			<?php
+		}
+		?>
+		
 		<style>
 			#pwp-toolbar-wrap {
 				background: #fff;
@@ -355,7 +382,7 @@ class PWP_Form_Manager {
 	 * Render Tab: Mail
 	 */
 	public function render_tab_mail( $post ) {
-		// Defaults mimicking CF7
+		// --- MAIL 1 (Admin Notification) ---
 		$to = get_post_meta( $post->ID, '_pwp_mail_to', true ) ?: '[_site_admin_email]';
 		$from = get_post_meta( $post->ID, '_pwp_mail_from', true ) ?: '[_site_title] <wordpress@' . $_SERVER['HTTP_HOST'] . '>';
 		$subject = get_post_meta( $post->ID, '_pwp_mail_subject', true ) ?: '[_site_title] "[your-subject]"';
@@ -363,7 +390,14 @@ class PWP_Form_Manager {
 		$body = get_post_meta( $post->ID, '_pwp_mail_body', true ) ?: "From: [your-name] <[your-email]>\nSubject: [your-subject]\n\nMessage Body:\n[your-message]\n\n-- \nThis is a notification that a contact form was submitted on your website ([_site_title] [_site_url]).";
 		$attachments = get_post_meta( $post->ID, '_pwp_mail_attachments', true ) ?: '[your-file]';
 
+		// --- MAIL 2 (User Confirmation) ---
+		$mail_2_active = get_post_meta( $post->ID, '_pwp_mail_2_active', true );
+		$mail_2_to = get_post_meta( $post->ID, '_pwp_mail_2_to', true ) ?: '[your-email]';
+		$mail_2_subject = get_post_meta( $post->ID, '_pwp_mail_2_subject', true ) ?: '[_site_title] - Receipt';
+		$mail_2_body = get_post_meta( $post->ID, '_pwp_mail_2_body', true ) ?: "Hi [your-name],\n\nThank you for your message. We have received it and will get back to you shortly.\n\n--\n[_site_title]";
 		?>
+		
+		<h3 class="pwp-section-title" style="margin-top:0; padding-bottom:10px; border-bottom:1px solid #ddd;">Mail 1 (Admin Notification)</h3>
 		<div class="pwp-field-row">
 			<label>To</label>
 			<input type="text" name="pwp_mail_to" value="<?php echo esc_attr( $to ); ?>" class="large-text">
@@ -382,13 +416,36 @@ class PWP_Form_Manager {
 		</div>
 		<div class="pwp-field-row">
 			<label>Message Body</label>
-			<textarea name="pwp_mail_body" rows="12" class="large-text"><?php echo esc_textarea( $body ); ?></textarea>
+			<textarea name="pwp_mail_body" rows="8" class="large-text"><?php echo esc_textarea( $body ); ?></textarea>
 			<p class="description">Use [your-name], [your-email] tags corresponding to form field names.</p>
 		</div>
 		<div class="pwp-field-row">
 			<label>File Attachments</label>
 			<textarea name="pwp_mail_attachments" rows="2" class="large-text"><?php echo esc_textarea( $attachments ); ?></textarea>
-			<p class="description">Enter file tags (e.g., [file-123]) one per line.</p>
+		</div>
+
+		<hr style="margin: 30px 0; border: 0; border-top: 1px solid #ddd;">
+
+		<h3 class="pwp-section-title">
+			<label style="font-weight:600;">
+				<input type="checkbox" name="pwp_mail_2_active" value="1" <?php checked( $mail_2_active, '1' ); ?> onclick="jQuery('#pwp-mail-2-group').toggle();">
+				Use Mail 2 (User Confirmation)
+			</label>
+		</h3>
+		
+		<div id="pwp-mail-2-group" style="<?php echo ( $mail_2_active ) ? '' : 'display:none;'; ?> margin-left: 20px; border-left: 2px solid #2271b1; padding-left: 20px;">
+			<div class="pwp-field-row">
+				<label>To</label>
+				<input type="text" name="pwp_mail_2_to" value="<?php echo esc_attr( $mail_2_to ); ?>" class="large-text">
+			</div>
+			<div class="pwp-field-row">
+				<label>Subject</label>
+				<input type="text" name="pwp_mail_2_subject" value="<?php echo esc_attr( $mail_2_subject ); ?>" class="large-text">
+			</div>
+			<div class="pwp-field-row">
+				<label>Message Body</label>
+				<textarea name="pwp_mail_2_body" rows="8" class="large-text"><?php echo esc_textarea( $mail_2_body ); ?></textarea>
+			</div>
 		</div>
 		<?php
 	}
@@ -466,6 +523,11 @@ class PWP_Form_Manager {
 			'pwp_mail_headers',
 			'pwp_mail_body',
 			'pwp_mail_attachments',
+			// Mail 2 (User Confirmation)
+			'pwp_mail_2_active',
+			'pwp_mail_2_to',
+			'pwp_mail_2_subject',
+			'pwp_mail_2_body',
 			'pwp_additional_settings',
 			// Messages
 			'pwp_msg_success',
