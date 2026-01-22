@@ -31,9 +31,17 @@ class PWP_Form_Submit {
 		$msg_invalid_email = get_post_meta( $form_id, '_pwp_msg_invalid_email', true ) ?: 'Please enter a valid email address.';
 		$msg_upload_fail = get_post_meta( $form_id, '_pwp_msg_upload_failed', true ) ?: 'There was an unknown error uploading the file.';
 
+
 		// Honeypot Check (Late check to use custom message)
 		if ( ! empty( $_POST['pwp_hp_check'] ) ) {
 			wp_send_json_error( [ 'message' => $msg_spam ] );
+		}
+
+		// RATE LIMITING: Check IP-based submission rate (prevents spam/abuse)
+		$user_ip = $_SERVER['REMOTE_ADDR'] ?? '';
+		$rate_limit_check = $this->check_rate_limit( $user_ip );
+		if ( is_wp_error( $rate_limit_check ) ) {
+			wp_send_json_error( [ 'message' => $rate_limit_check->get_error_message() ] );
 		}
 
 		// 2.5 Captcha Check
@@ -185,5 +193,50 @@ class PWP_Form_Submit {
 		// 8. Return Success
 		$msg_success = get_post_meta( $form_id, '_pwp_msg_success', true ) ?: 'Thank you for your message. It has been sent.';
 		wp_send_json_success( [ 'message' => $msg_success ] );
+	}
+
+	/**
+	 * Check IP-based rate limiting
+	 * Prevents spam by limiting submissions per IP address
+	 * 
+	 * @param string $ip IP address to check
+	 * @return bool|WP_Error True if allowed, WP_Error if rate limit exceeded
+	 */
+	private function check_rate_limit( $ip ) {
+		// Skip check for empty IP (shouldn't happen, but defensive)
+		if ( empty( $ip ) ) {
+			return true;
+		}
+
+		// Sanitize IP for use in transient key
+		$ip_hash = md5( $ip );
+		$transient_key = 'pwp_rate_limit_' . $ip_hash;
+		
+		// Get current submission count for this IP
+		$submission_count = get_transient( $transient_key );
+		
+		// Get max submissions per hour (filterable for customization)
+		$max_submissions = apply_filters( 'pwp_max_submissions_per_hour', 10 );
+		
+		if ( $submission_count === false ) {
+			// First submission from this IP in the last hour
+			set_transient( $transient_key, 1, HOUR_IN_SECONDS );
+			return true;
+		} else {
+			// Check if limit exceeded
+			if ( $submission_count >= $max_submissions ) {
+				return new WP_Error( 
+					'rate_limit_exceeded',
+					sprintf( 
+						'Too many submissions. Please wait before submitting again. (Limit: %d per hour)',
+						$max_submissions
+					)
+				);
+			}
+			
+			// Increment counter
+			set_transient( $transient_key, $submission_count + 1, HOUR_IN_SECONDS );
+			return true;
+		}
 	}
 }

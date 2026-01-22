@@ -94,12 +94,36 @@ class PWP_Database {
 
 						if ( $real_path && $real_base && strpos( $real_path, $real_base ) === 0 ) {
 							if ( file_exists( $file_path ) ) {
-								unlink( $file_path );
+								// SAFETY CHECK: Ensure file isn't used by another submission (race condition prevention)
+								if ( ! self::is_file_used_elsewhere( $file_path ) ) {
+									unlink( $file_path );
+								}
 							}
 						}
 					}
 				}
 			}
 		}
+	}
+
+	/**
+	 * Check if a file is used by other submissions
+	 * Prevents race condition where deleting one submission breaks another
+	 * 
+	 * @param string $file_path File path to check
+	 * @return bool True if file is used elsewhere, false if safe to delete
+	 */
+	private static function is_file_used_elsewhere( $file_path ) {
+		global $wpdb;
+		$table_name = $wpdb->prefix . 'pwp_submissions';
+		
+		// Search all submissions for this file path
+		$count = $wpdb->get_var( $wpdb->prepare(
+			"SELECT COUNT(*) FROM $table_name WHERE uploaded_files LIKE %s",
+			'%' . $wpdb->esc_like( $file_path ) . '%'
+		) );
+		
+		// If more than 1 submission references this file, it's in use
+		return ( $count > 1 );
 	}
 }

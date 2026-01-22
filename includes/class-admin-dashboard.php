@@ -97,10 +97,19 @@ class PWP_Admin_Dashboard {
 			$message = wp_kses_post( $_POST['reply_message'] );
 			$to = sanitize_email( $_POST['reply_to'] );
 
-			// Send Email
+
+			// Send Email using PWP_Email_Manager for consistent HTML template
 			$subject = 'Re: Your Support Request'; // Could be dynamic
+			
+			// Wrap admin's reply message in professional HTML template
+			require_once PWP_FORMS_PATH . 'includes/class-email-manager.php';
+			$styled_html = PWP_Email_Manager::get_styled_email_html( 
+				$subject, 
+				nl2br( $message )  // Convert line breaks to <br> tags
+			);
+			
 			$headers = [ 'Content-Type: text/html; charset=UTF-8' ];
-			wp_mail( $to, $subject, $message, $headers );
+			wp_mail( $to, $subject, $styled_html, $headers );
 
 			// Update Status & Note
 			global $wpdb;

@@ -3,7 +3,7 @@ Contributors: prowpkit
 Tags: form, contact, support, upload, captcha, secure
 Requires at least: 6.0
 Tested up to: 6.7
-Stable tag: 1.0.2
+Stable tag: 1.1.0
 License: GPLv2 or later
 
 A developer-first, secure, and professional form builder for Pro WP Kit.
@@ -33,6 +33,28 @@ ProWPKit Forms is a robust solution for handling contact forms, support tickets,
 4.  Use the shortcode `[pwp_form id="123"]` to display the form on any page.
 
 == Changelog ==
+
+= 1.1.0 =
+
+- **Security Enhancements**:
+  - Fixed PII leak: Moved user data pre-filling from server-side to client-side JavaScript to prevent cached pages from exposing personal information.
+  - Fixed nonce expiry: Implemented dynamic nonce fetching via AJAX to prevent form failures on cached pages.
+  - Added IP-based rate limiting (10 submissions/hour default) to prevent spam and abuse.
+  - Added safe file deletion with usage checks to prevent race conditions.
+  - Standardized admin reply emails to use HTML templates for consistency.
+- **Email Improvements**:
+  - Admin replies now use `PWP_Email_Manager` for professional HTML formatting.
+  - Consistent branding across all email communications.
+- **JavaScript Enhancements**:
+  - Implemented client-side user data population for logged-in users.
+  - Fresh nonce fetching on page load for cache compatibility.
+  - Auto-populate and re-populate name/email fields after form submission.
+- **Performance**:
+  - Optimized for full-page caching (WP Super Cache, W3 Total Cache, CDN).
+  - Reduced server-side processing by moving dynamic data to JavaScript.
+- **Developer Features**:
+  - Added `pwp_max_submissions_per_hour` filter for customizable rate limits.
+  - Database prepared statements for improved SQL injection protection.
 
 = 1.0.2 =
 

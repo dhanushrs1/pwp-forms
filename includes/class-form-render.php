@@ -9,6 +9,12 @@ class PWP_Form_Render {
 	public function __construct() {
 		add_shortcode( 'pwp_form', [ $this, 'render_shortcode' ] );
 		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_assets' ] );
+		
+		// AJAX endpoints for cache-safe dynamic data
+		add_action( 'wp_ajax_pwp_get_form_nonce', [ $this, 'ajax_get_nonce' ] );
+		add_action( 'wp_ajax_nopriv_pwp_get_form_nonce', [ $this, 'ajax_get_nonce' ] );
+		add_action( 'wp_ajax_pwp_get_user_data', [ $this, 'ajax_get_user_data' ] );
+		add_action( 'wp_ajax_nopriv_pwp_get_user_data', [ $this, 'ajax_get_user_data' ] );
 	}
 
 	/**
@@ -40,9 +46,10 @@ class PWP_Form_Render {
 		// Enqueue assets when shortcode is used
 		wp_enqueue_script( 'pwp-forms-js' );
 		wp_enqueue_style( 'pwp-forms-css' );
+		// SECURITY FIX: Nonce removed to prevent caching issues
+		// JavaScript will fetch a fresh nonce via AJAX to prevent expiry on cached pages
 		wp_localize_script( 'pwp-forms-js', 'pwp_forms_vars', [
-			'ajax_url' => admin_url( 'admin-ajax.php' ),
-			'nonce'    => wp_create_nonce( 'pwp_form_submit' )
+			'ajax_url' => admin_url( 'admin-ajax.php' )
 		]);
 
 		return $this->generate_form_html( $form_id );
@@ -92,35 +99,10 @@ class PWP_Form_Render {
 			}, $form_html );
 		}
 
-		// 3. User Identity Handling (Logged-in)
-		if ( $is_user_logged_in ) {
-			$current_user = wp_get_current_user();
-			$user_name = $current_user->display_name;
-			$user_email = $current_user->user_email;
-
-			// Auto-fill and Lock Name Field
-			// Regex looks for: name="name" (case insensitive) and adds/replaces value/readonly
-			// NOTE: This is a simple regex replacement. For complex HTML parsing, DOMDocument is better.
-			// But for developer-controlled HTML within this plugin, regex is faster/sane enough usually.
-			
-			// Replace Name Input
-			$form_html = preg_replace_callback( '/<input[^>]*name=["\']name["\'][^>]*>/i', function( $matches ) use ( $user_name ) {
-				$input = $matches[0];
-				// Remove existing value/readonly if any
-				$input = preg_replace( '/value=["\'][^"\']*["\']/', '', $input );
-				$input = preg_replace( '/readonly/', '', $input );
-				// Add new value and readonly
-				return str_replace( '<input', '<input value="' . esc_attr( $user_name ) . '" readonly ', $input );
-			}, $form_html );
-
-			// Replace Email Input
-			$form_html = preg_replace_callback( '/<input[^>]*name=["\']email["\'][^>]*>/i', function( $matches ) use ( $user_email ) {
-				$input = $matches[0];
-				$input = preg_replace( '/value=["\'][^"\']*["\']/', '', $input );
-				$input = preg_replace( '/readonly/', '', $input );
-				return str_replace( '<input', '<input value="' . esc_attr( $user_email ) . '" readonly ', $input );
-			}, $form_html );
-		}
+		// 3. SECURITY FIX: User identity handling moved to JavaScript
+		// Pre-filling user data server-side causes PII leaks on cached pages
+		// JavaScript will populate name/email fields dynamically after page load
+		// No server-side modification of form HTML for logged-in users
 
 		// 4. Wrap & Output
 		// We add a honeypot field hidden
@@ -164,5 +146,34 @@ class PWP_Form_Render {
 		</form>
 		<?php
 		return ob_get_clean();
+	}
+
+	/**
+	 * AJAX: Get Fresh Nonce
+	 * Prevents cached pages from having expired nonces
+	 */
+	public function ajax_get_nonce() {
+		wp_send_json_success( [
+			'nonce' => wp_create_nonce( 'pwp_form_submit' )
+		] );
+	}
+
+	/**
+	 * AJAX: Get User Data
+	 * Prevents cached pages from exposing PII
+	 */
+	public function ajax_get_user_data() {
+		if ( is_user_logged_in() ) {
+			$current_user = wp_get_current_user();
+			wp_send_json_success( [
+				'logged_in' => true,
+				'name'      => $current_user->display_name,
+				'email'     => $current_user->user_email
+			] );
+		} else {
+			wp_send_json_success( [
+				'logged_in' => false
+			] );
+		}
 	}
 }
