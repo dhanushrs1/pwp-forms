@@ -2,100 +2,38 @@
 
 ![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)
 ![WordPress](https://img.shields.io/badge/WordPress-6.0%2B-blue.svg)
-![PHP](https://img.shields.io/badge/PHP-8.0%2B-purple.svg)
 ![License](https://img.shields.io/badge/license-GPLv2%2B-green.svg)
 
-A **developer-first**, **security-focused**, and **cache-compatible** WordPress form builder plugin. Write forms in raw HTML while ProWPKit Forms handles all the backend security, validation, email notifications, and submission management automatically.
+A **secure**, **cache-compatible** WordPress form builder plugin. Write custom HTML forms while we handle security, spam protection, and email notifications automatically.
 
 ---
 
-## 🚀 Key Features
+## ✨ Features
 
-### 🎨 Developer-First Approach
-
-- **Raw HTML Forms**: Write custom form HTML without drag-and-drop limitations
-- **No Bloat**: Clean, efficient code without unnecessary dependencies
-- **WordPress Standards**: Follows WordPress coding standards and best practices
-- **Extensible**: Filters and hooks for customization
-
-### 🔒 Security Built-In
-
-- **Multi-Layer Validation**: Nonce checks, honeypot, captcha, and server-side validation
-- **IP-Based Rate Limiting**: Prevent spam (10 submissions/hour per IP, customizable)
-- **Cache-Safe**: Dynamic nonce and user data fetching prevents expired nonces and PII leaks
-- **GDPR Compliant**: Right to be forgotten with secure data deletion
-- **Safe File Deletion**: Race condition prevention for file references
-
-### 📧 Professional Email System
-
-- **HTML Email Templates**: Branded emails with logo, colors, and custom styling
-- **Smart Tag System**: Dynamic placeholders like `[your-name]`, `[_site_title]`, `[_all_fields]`
-- **Admin & User Emails**: Separate customizable templates
-- **Reply System**: Admin replies use same professional template
-
-### 📊 Powerful Admin Dashboard
-
-- **Submissions List Table**: Pagination, sorting, bulk actions
-- **Advanced Filtering**: Filter by status (New, Read, Replied, Closed) and date
-- **Enhanced Search**: Search by email, content, or form ID
-- **Detail View**: Metabox layout for viewing and replying to submissions
-- **Screen Options**: Customizable items per page
-
-### 🛡️ Anti-Spam Protection
-
-- **Cloudflare Turnstile**: Privacy-focused captcha (no tracking)
-- **Google reCAPTCHA v2**: Alternative captcha option
-- **Honeypot Field**: Invisible spam trap
-- **Rate Limiting**: IP-based submission limits
-- **File Upload Restrictions**: Logged-in users only (configurable)
-
-### 📤 Smart File Uploads
-
-- **Type Validation**: Whitelist-based MIME type checking
-- **Size Limits**: Configurable per-file and total user quotas
-- **Auto-Organization**: Year/Month folder structure
-- **Multi-File Support**: Handle single or array uploads seamlessly
-- **Guest Protection**: File inputs locked for non-logged-in users
-
-### ⚡ Performance & Compatibility
-
-- **Cache Compatible**: Works with WP Super Cache, W3 Total Cache, CDN caching
-- **No Page Reloads**: AJAX-based submissions with loading states
-- **Optimized Queries**: Prepared statements and indexed database columns
-- **Transient-Based Rate Limits**: Auto-expiring with object cache support
+- ⚡ **Raw HTML Forms** - Full control over your form design
+- 🔒 **Built-in Security** - Nonce checks, honeypot, captcha, rate limiting
+- 📧 **Professional Emails** - Branded HTML templates with custom styling
+- 🛡️ **Anti-Spam** - Cloudflare Turnstile, reCAPTCHA, IP rate limiting
+- 📊 **Admin Dashboard** - Manage submissions with filters and search
+- 💾 **Cache Compatible** - Works with all caching plugins and CDNs
+- 🎨 **Customizable** - Full CSS control and email template customization
+- 📁 **File Uploads** - Secure uploads with type validation
 
 ---
 
-## 📦 Installation
+## 🚀 Quick Start
 
-### From GitHub
+### Installation
 
-1. Download the latest release or clone this repository:
+1. Download the plugin
+2. Upload to `/wp-content/plugins/pwp-forms/`
+3. Activate via **WordPress Admin → Plugins**
+4. Go to **Pro Forms** to create your first form
 
-   ```bash
-   cd wp-content/plugins/
-   git clone https://github.com/dhanushrs1/pwp-forms/.git
-   ```
+### Create a Form
 
-2. Activate the plugin via **WordPress Admin → Plugins**
-
-3. Navigate to **Pro Forms** to create your first form
-
-### Manual Installation
-
-1. Download and extract the plugin ZIP file
-2. Upload the `pwp-forms` folder to `/wp-content/plugins/`
-3. Activate through the 'Plugins' menu in WordPress
-
----
-
-## 🎯 Quick Start Guide
-
-### 1. Create Your First Form
-
-1. Go to **Pro Forms → Add New Form**
-2. Enter a form title (e.g., "Contact Form")
-3. In the **Form** tab, add your HTML:
+1. Navigate to **Pro Forms → Add New Form**
+2. Add your HTML in the Form tab:
 
 ```html
 <div class="pwp-field">
@@ -104,7 +42,7 @@ A **developer-first**, **security-focused**, and **cache-compatible** WordPress 
 </div>
 
 <div class="pwp-field">
-  <label>Email Address</label>
+  <label>Email</label>
   <input type="email" name="email" class="pwp-input" required />
 </div>
 
@@ -114,298 +52,114 @@ A **developer-first**, **security-focused**, and **cache-compatible** WordPress 
 </div>
 ```
 
-4. Configure email settings in the **Mail** tab
-5. Customize messages in the **Messages** tab
-6. Click **Publish**
+3. Configure email settings in the **Mail** tab
+4. Click **Publish** and copy the shortcode
 
-### 2. Display the Form
+### Display the Form
 
-Copy the shortcode from the sidebar and add it to any page or post:
+Add the shortcode to any page or post:
 
 ```
 [pwp_form id="123"]
 ```
 
-### 3. View Submissions
-
-Go to **Pro Forms → Submissions** to view, filter, search, and reply to submissions.
-
 ---
 
 ## 📖 User Guide
 
-### Form Builder
+### Form Builder Toolbar
 
-#### Toolbar Field Snippets
+Use the toolbar to insert field types:
 
-Use the horizontally scrollable toolbar to insert common field types:
+- **Text Inputs:** Text, Email, Tel, URL, Number, Date
+- **Selection:** Dropdown, Checkbox, Radio
+- **Advanced:** File Upload, Acceptance, Hidden
 
-**Text Inputs:**
-
-- Text, Email, Tel, URL, Number, Date, Textarea
-
-**Selection:**
-
-- Dropdown, Checkbox, Radio
-
-**Advanced:**
-
-- File Upload, Acceptance Checkbox, Hidden Fields
-
-#### Submit Button
-
-The submit button is automatically added. Customize the label in the **Submit Button Label** field above the editor.
-
-#### Available CSS Classes
-
-Apply these classes for consistent styling:
-
-- `.pwp-field` - Field container
-- `.pwp-input` - Standard inputs
-- `.pwp-textarea` - Textareas
-- `.pwp-checkbox` - Checkbox labels
-- `.pwp-radio` - Radio button labels
-- `.pwp-half` - 50% width on desktop
-- `.pwp-third` - 33% width on desktop
-
----
+The submit button is added automatically. Customize the label above the editor.
 
 ### Email Configuration
 
-#### Mail Tab Options
+Configure in the **Mail** tab:
 
-**To:** Recipient email (supports tags like `[_site_admin_email]`)  
-**From:** Sender name and email  
-**Subject:** Email subject line with tag support  
-**Headers:** Additional headers (e.g., `Reply-To: [your-email]`)  
-**Body:** Email content with HTML and tags  
-**Attachments:** File field tags to attach
+**Smart Tags Available:**
 
-#### Available Smart Tags
+- `[your-name]`, `[your-email]` - Form field values
+- `[_all_fields]` - Auto-generated table of all data
+- `[_site_title]`, `[_site_url]` - Website info
+- `[_date]`, `[_time]` - Submission timestamp
 
-**Form Fields:**
-
-- `[your-name]`, `[your-email]`, `[your-message]` - Any field by name attribute
-
-**Special Tags:**
-
-- `[_all_fields]` - Auto-generates HTML table with all submission data
-- `[_site_title]` - Website name
-- `[_site_url]` - Website URL
-- `[_site_admin_email]` - Admin email from WordPress settings
-- `[_date]` - Submission date
-- `[_time]` - Submission time
-- `[_remote_ip]` - Submitter's IP address
-
-#### Example Email Template
+**Example Template:**
 
 ```html
 <h2>New Contact Form Submission</h2>
-<p>You have received a new message from [your-name].</p>
-
-<h3>Contact Details:</h3>
-<ul>
-  <li><strong>Name:</strong> [your-name]</li>
-  <li><strong>Email:</strong> [your-email]</li>
-</ul>
-
-<h3>Message:</h3>
-<p>[your-message]</p>
-
+<p>From: [your-name] ([your-email])</p>
+<p>Message: [your-message]</p>
 <hr />
-<p><small>Submitted on [_date] at [_time] from IP: [_remote_ip]</small></p>
+<p>Submitted: [_date] at [_time]</p>
 ```
+
+### Email Styling
+
+Customize in **Pro Forms → Settings → Email Templates**:
+
+- Logo URL
+- Color palette (background, container, text, accent)
+- Font family and size
+- Footer text
+
+All emails (automated + admin replies) use these settings.
+
+### Managing Submissions
+
+Go to **Pro Forms → Submissions** to:
+
+**Filter by:**
+
+- Status (New, Read, Replied, Closed)
+- Date (month/year picker)
+- Search (email, content, or form ID)
+
+**Actions:**
+
+- View submission details
+- Reply directly to user
+- Change status
+- Delete submission
+- Bulk delete
+
+**GDPR Compliance:**
+
+- Use "Privacy Tools" to delete all data for an email address
+- Removes submissions and associated files
+
+### Anti-Spam Settings
+
+Configure in **Pro Forms → Settings → General**:
+
+**Captcha Options:**
+
+1. **Cloudflare Turnstile** (recommended)
+   - Get free keys at [Turnstile](https://developers.cloudflare.com/turnstile/)
+   - No tracking, privacy-friendly
+
+2. **Google reCAPTCHA v2**
+   - Get keys at [reCAPTCHA](https://www.google.com/recaptcha/)
+
+**Rate Limiting:**
+
+- Default: 10 submissions per hour per IP
+- Prevents spam and abuse automatically
+- No configuration needed
 
 ---
 
-### Email Styling (Global Settings)
+## 🎨 Styling Your Forms
 
-Navigate to **Pro Forms → Settings → Email Templates** to customize:
-
-- **Logo URL:** Header logo for all emails
-- **Color Palette:** Background, container, text, and accent colors
-- **Typography:** Font family and size
-- **Footer Text:** Appears at bottom of all emails
-
-All emails (automated and admin replies) use these settings for consistent branding.
-
----
-
-### Submission Management
-
-#### Submissions List
-
-**Filtering:**
-
-- **Status:** New, Read, Replied, Closed
-- **Date:** Month/year picker
-- **Search:** Email, content, or form ID
-
-**Bulk Actions:**
-
-- Delete multiple submissions at once
-
-**Screen Options:**
-
-- Customize submissions per page (top-right corner)
-
-#### Detail View
-
-When viewing a submission:
-
-1. **Submission Data:** All form fields in a table
-2. **Attached Files:** Download links with file sizes
-3. **Reply Form:** Send professional HTML email directly to submitter
-4. **Status Management:** Change status (New → Read → Replied → Closed)
-5. **Delete:** Permanently remove submission and files
-
-#### GDPR Tools
-
-Expand the **Privacy Tools** accordion to delete all data for a specific email address:
-
-1. Enter the user's email
-2. Click **Delete Data**
-3. Confirms deletion of all submissions and associated files
-
----
-
-### Security Settings
-
-#### Captcha Configuration
-
-**Settings → General → Spam Protection**
-
-Choose your captcha provider:
-
-**Cloudflare Turnstile (Recommended):**
-
-1. Get free keys at [Cloudflare Turnstile](https://developers.cloudflare.com/turnstile/)
-2. Enter Site Key and Secret Key
-3. Captcha appears automatically on all forms
-
-**Google reCAPTCHA v2:**
-
-1. Get keys at [Google reCAPTCHA](https://www.google.com/recaptcha/)
-2. Select reCAPTCHA v2 (checkbox)
-3. Enter Site Key and Secret Key
-
-**None:** Disable captcha (not recommended for public forms)
-
-#### Rate Limiting
-
-Default: **10 submissions per hour per IP address**
-
-Customize via filter in your theme's `functions.php`:
-
-```php
-// Increase limit for logged-in users
-add_filter( 'pwp_max_submissions_per_hour', function( $limit ) {
-    if ( is_user_logged_in() ) {
-        return 50; // 50/hour for logged-in users
-    }
-    return 10; // 10/hour for guests
-});
-
-// Unlimited for administrators
-add_filter( 'pwp_max_submissions_per_hour', function( $limit ) {
-    if ( current_user_can( 'manage_options' ) ) {
-        return PHP_INT_MAX;
-    }
-    return $limit;
-});
-
-// Stricter limit for specific form
-add_filter( 'pwp_max_submissions_per_hour', function( $limit ) {
-    if ( ! empty( $_POST['form_id'] ) && $_POST['form_id'] == 123 ) {
-        return 3; // Only 3/hour for form #123
-    }
-    return $limit;
-});
-```
-
----
-
-## 🔧 Developer Documentation
-
-### Hooks & Filters
-
-#### Filters
-
-```php
-// Customize submission rate limit
-apply_filters( 'pwp_max_submissions_per_hour', 10 );
-
-// Customize user upload quota (MB)
-apply_filters( 'pwp_user_max_quota_mb', 50, $user_id );
-
-// Customize upload limit per hour
-apply_filters( 'pwp_max_uploads_per_hour', 10, $user_id );
-```
-
-#### Actions
-
-```php
-// After submission saved (coming in future updates)
-do_action( 'pwp_after_submission', $submission_id, $form_id, $data );
-
-// Before email send (coming in future updates)
-do_action( 'pwp_before_email', $to, $subject, $body, $headers );
-```
-
-### AJAX Endpoints
-
-**Get Fresh Nonce:**
-
-```javascript
-$.post(ajaxurl, { action: "pwp_get_form_nonce" }, function (response) {
-  console.log(response.data.nonce);
-});
-```
-
-**Get User Data:**
-
-```javascript
-$.post(ajaxurl, { action: "pwp_get_user_data" }, function (response) {
-  if (response.data.logged_in) {
-    console.log(response.data.name, response.data.email);
-  }
-});
-```
-
-### Database Schema
-
-**Table:** `wp_pwp_submissions`
-
-| Column            | Type         | Description                         |
-| ----------------- | ------------ | ----------------------------------- |
-| `id`              | bigint(20)   | Primary key                         |
-| `form_id`         | bigint(20)   | Reference to form post ID           |
-| `user_id`         | bigint(20)   | WordPress user ID (NULL for guests) |
-| `user_email`      | varchar(100) | Submitter email                     |
-| `submission_type` | varchar(50)  | Form type (general, support)        |
-| `submission_data` | longtext     | JSON-encoded form fields            |
-| `uploaded_files`  | text         | JSON array of file paths            |
-| `user_ip`         | varchar(45)  | IP address (IPv6 supported)         |
-| `status`          | varchar(50)  | new/read/replied/closed             |
-| `admin_notes`     | text         | Internal notes                      |
-| `created_at`      | datetime     | Submission timestamp                |
-
----
-
-## 🎨 Customization Examples
-
-### Custom Form Styling
-
-Add to your theme's CSS:
+The plugin includes minimal styling. Add custom CSS in your theme:
 
 ```css
 .pwp-form {
   max-width: 600px;
-  margin: 0 auto;
-}
-
-.pwp-field {
-  margin-bottom: 1.5rem;
 }
 
 .pwp-input,
@@ -415,217 +169,97 @@ Add to your theme's CSS:
   padding: 12px;
 }
 
-.pwp-input:focus,
-.pwp-textarea:focus {
-  border-color: #007cba;
-  box-shadow: 0 0 0 3px rgba(0, 124, 186, 0.1);
-}
-
 .pwp-submit {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border: none;
+  background: #667eea;
+  color: white;
   padding: 16px 48px;
-  font-weight: 600;
-  letter-spacing: 0.5px;
 }
 ```
 
-### Multi-Column Layout
+**Built-in Classes:**
 
-```html
-<div class="pwp-field pwp-half">
-  <label>First Name</label>
-  <input type="text" name="first-name" class="pwp-input" required />
-</div>
-
-<div class="pwp-field pwp-half">
-  <label>Last Name</label>
-  <input type="text" name="last-name" class="pwp-input" required />
-</div>
-
-<div class="pwp-field">
-  <label>Email (Full Width)</label>
-  <input type="email" name="email" class="pwp-input" required />
-</div>
-```
+- `.pwp-field` - Field wrapper
+- `.pwp-input` - Input styling
+- `.pwp-textarea` - Textarea styling
+- `.pwp-half` - 50% width on desktop
+- `.pwp-third` - 33% width on desktop
 
 ---
 
-## 🔄 Changelog
+## 📝 Changelog
 
-### Version 1.1.0 (Current)
+### Version 1.1.0 (Current Release)
 
-**Security Enhancements:**
+**Security Improvements:**
 
-- ✅ Fixed PII leak on cached pages (moved user data to client-side JavaScript)
-- ✅ Fixed nonce expiry on cached pages (dynamic AJAX fetching)
-- ✅ Added IP-based rate limiting (10/hour default, filterable)
-- ✅ Added safe file deletion with usage checks
-- ✅ Standardized admin reply emails with HTML templates
-
-**Email Improvements:**
-
-- ✅ Admin replies use `PWP_Email_Manager` for consistent branding
-- ✅ Professional HTML formatting for all communications
-
-**JavaScript Enhancements:**
-
-- ✅ Client-side user data population for logged-in users
-- ✅ Fresh nonce fetching on page load
-- ✅ Auto-populate fields after form reset
+- Fixed PII leak on cached pages
+- Fixed nonce expiry issues
+- Added IP-based rate limiting (10/hour)
+- Safe file deletion with usage checks
+- Admin replies use HTML templates
 
 **Performance:**
 
-- ✅ Full-page caching compatible (WP Super Cache, W3 Total Cache, CDN)
-- ✅ Reduced server-side processing
+- Full caching compatibility (CDN, page cache)
+- Dynamic data loading via JavaScript
+- Reduced server processing
 
-**Developer Features:**
+**New Features:**
 
-- ✅ `pwp_max_submissions_per_hour` filter
-- ✅ Improved SQL injection protection with prepared statements
+- Client-side user data population
+- Fresh nonce fetching on page load
+- Customizable rate limits via filter
 
-### Version 1.0.2
-
-- Horizontally scrollable toolbar
-- Auto-submit button with customizable label
-- Visual color swatches in emails
-- Added 'Closed' status
-- Fixed status display bugs
-
-### Version 1.0.1
-
-- Fixed file deletion security vulnerability
-- Strict MIME type checking
-- Multi-file upload normalization
-
-### Version 1.0.0
-
-- Initial release
-- Custom post type forms
-- AJAX submissions
-- Cloudflare Turnstile integration
-- Email notification system
-- Admin dashboard with WP_List_Table
-
-[Full Changelog →](readme.txt)
+[View Full Changelog](readme.txt)
 
 ---
 
 ## 🛠️ Requirements
 
-- **WordPress:** 6.0 or higher
-- **PHP:** 8.0 or higher
-- **MySQL:** 5.7 or higher (or MariaDB 10.2+)
-
-**Recommended:**
-
-- WordPress 6.4+
-- PHP 8.1+
-- HTTPS/SSL for security
-- Object caching (Redis/Memcached) for high-traffic sites
+- WordPress 6.0+
+- PHP 8.0+
+- HTTPS recommended
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please follow these guidelines:
+We welcome contributions! See [DEVELOPER.md](DEVELOPER.md) for technical documentation.
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+**For Developers:**
 
-### Coding Standards
-
-- Follow [WordPress Coding Standards](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/)
-- Add PHPDoc comments for all functions
-- Write security-first code (sanitize inputs, escape outputs)
-- Test with WordPress Debug mode enabled
+- Hooks & Filters documentation
+- AJAX endpoints
+- Database schema
+- Customization examples
 
 ---
 
 ## 📄 License
 
-This plugin is licensed under the [GPLv2 (or later)](https://www.gnu.org/licenses/gpl-2.0.html).
-
-```
-ProWPKit Forms - WordPress Form Builder Plugin
-Copyright (C) 2024 Pro WP Kit Team
-
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-```
-
----
-
-## 🐛 Bug Reports & Feature Requests
-
-Found a bug or have a feature request? Please [open an issue](https://github.com/dhanushrs1/pwp-forms/issues) with:
-
-**For Bugs:**
-
-- WordPress version
-- PHP version
-- Plugin version
-- Steps to reproduce
-- Expected vs actual behavior
-- Screenshots (if applicable)
-
-**For Features:**
-
-- Clear description of the feature
-- Use case / problem it solves
-- Proposed implementation (if technical)
+GPLv2 or later. See [LICENSE](LICENSE) for details.
 
 ---
 
 ## 💬 Support
 
-- **Documentation:** This README and inline code comments
+- **Documentation:** [DEVELOPER.md](DEVELOPER.md) for technical docs
 - **Issues:** [GitHub Issues](https://github.com/dhanushrs1/pwp-forms/issues)
-- **Community:** [WordPress.org Support Forum](https://wordpress.org/support/plugin/pwp-forms/)
+- **Community:** [WordPress Support Forum](https://wordpress.org/support/plugin/pwp-forms/)
 
 ---
 
-## 🌟 Credits
+## 🎯 What's Next?
 
-**Developed by:** [Pro WP Kit Team](https://prowpkit.com)
-
-**Built with WordPress Standards:**
-
-- Custom Post Types
-- WP_List_Table
-- WordPress Settings API
-- WordPress Transients API
-- wp_mail() for email
-- wp_enqueue_script/style for assets
-
-**Inspired by:** Contact Form 7's developer-friendly approach
-
----
-
-## 🎯 Roadmap
-
-- [ ] Visual form builder (optional, for non-developers)
-- [ ] Conditional logic fields
+- [ ] Visual form builder
+- [ ] Conditional logic
 - [ ] Multi-step forms
-- [ ] CSV export for submissions
-- [ ] Webhook integrations (Zapier, Make, n8n)
-- [ ] Payment integration (Stripe, PayPal)
-- [ ] Form analytics dashboard
-- [ ] Email queue system for high-traffic sites
-- [ ] A/B testing for forms
+- [ ] CSV export
+- [ ] Webhook integrations
+- [ ] Payment gateways
 
-**Vote on features:** [GitHub Discussions](https://github.com/dhanushrs1/pwp-forms/discussions)
+[Vote on features](https://github.com/dhanushrs1/pwp-forms/discussions)
 
 ---
 
-Made with ❤️ by the ProWPKit Team | [Website](https://prowpkit.com) | [GitHub](https://github.com/dhanushrs1)
+**Made with ❤️ by the ProWPKit Team** | [Website](https://prowpkit.com) | [GitHub](https://github.com/dhanushrs1)
