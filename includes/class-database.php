@@ -31,7 +31,6 @@ class PWP_Database {
 			KEY form_id (form_id),
 			KEY user_id (user_id),
 			KEY user_email (user_email),
-			KEY user_email (user_email),
 			KEY status (status)
 		) $charset_collate;";
 
