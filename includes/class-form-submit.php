@@ -139,8 +139,33 @@ class PWP_Form_Submit {
 			$submission_data['email'] = $current_user->user_email;
 		} else {
 			// Guest: Trust POST data (sanitized)
-			$user_email = isset( $submission_data['email'] ) ? sanitize_email( $submission_data['email'] ) : '';
+			// SMART DETECTION: Scan for email field if 'email' key doesn't exist directly
+			$detected_email = '';
+			
+			// 1. Check direct 'email' or 'your-email' (standard CF7/PWP style)
+			if ( ! empty( $submission_data['email'] ) ) {
+				$detected_email = $submission_data['email'];
+			} elseif ( ! empty( $submission_data['your-email'] ) ) {
+				$detected_email = $submission_data['your-email'];
+			} else {
+				// 2. Scan keys for "email" string
+				foreach ( $submission_data as $key => $val ) {
+					if ( stripos( $key, 'email' ) !== false && is_email( $val ) ) {
+						$detected_email = $val;
+						break;
+					}
+				}
+			}
+
+			// 3. Validate
+			$user_email = sanitize_email( $detected_email );
 			if ( ! is_email( $user_email ) ) {
+				// If email is mandatory for "Mail 2" (User Notification), this might be critical.
+				// But valid submission might not ALWAYS require email? 
+				// Current logic was: if ( ! is_email( $user_email ) ) error...
+				// Let's keep strict check if simple 'email' field was expected, 
+				// but since we now scan, if we found NOTHING, maybe we prompt?
+				// For now, adhere to previous strictness: if we can't find a valid email, error.
 				wp_send_json_error( [ 'message' => $msg_invalid_email ] );
 			}
 		}
@@ -187,7 +212,7 @@ class PWP_Form_Submit {
 
 		// 7. Trigger Emails
 		if ( class_exists( 'PWP_Email_Manager' ) ) {
-			PWP_Email_Manager::send_notifications( $submission_id, $form_id, $submission_data, $uploaded_files );
+			PWP_Email_Manager::send_notifications( $submission_id, $form_id, $submission_data, $uploaded_files, $user_email );
 		}
 
 		// 8. Return Success

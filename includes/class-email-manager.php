@@ -6,7 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class PWP_Email_Manager {
 
-	public static function send_notifications( $submission_id, $form_id, $data, $files = [] ) {
+	public static function send_notifications( $submission_id, $form_id, $data, $files = [], $user_email_detected = '' ) {
 		// --- 1. MAIL 1 (Admin) SETUP ---
 		$to          = get_post_meta( $form_id, '_pwp_mail_to', true ) ?: get_option( 'admin_email' );
 		$from_header = get_post_meta( $form_id, '_pwp_mail_from', true ) ?: get_bloginfo( 'name' ) . ' <wordpress@' . $_SERVER['HTTP_HOST'] . '>';
@@ -50,20 +50,85 @@ class PWP_Email_Manager {
 
 			// Parse User Tags
 			$to_2 = self::parse_mail_tags( $to_2_tmpl, $data, $form_id );
-			$subject_2 = self::parse_mail_tags( $subject_2_tmpl, $data, $form_id );
-			$body_2_raw = self::parse_mail_tags( $body_2_tmpl, $data, $form_id );
+			
+			// INTELLIGENT FALLBACK: If parsed 'To' is empty (because field name mismatch), use detected email
+			if ( empty( trim( $to_2 ) ) && ! empty( $user_email_detected ) ) {
+				$to_2 = $user_email_detected;
+			} elseif ( $to_2 === $to_2_tmpl && ! empty( $user_email_detected ) ) {
+				// Also fallback if the tag wasn't replaced at all (e.g. [your-email] remained string literal)
+				// This check depends on parse_mail_tags behavior (it replaces unknown tags? no, it just does data replacement)
+				// Actually parse_mail_tags only replaces known keys. If [foo] isn't in data, it stays [foo].
+				// So we need to check if $to_2 still looks like a shortcode OR is empty/invalid
+				if ( strpos( $to_2, '[' ) !== false ) {
+					$to_2 = $user_email_detected;
+				}
+			}
 
-			// BRANDING: Apply Styled Template to User Email
-			$body_2_styled = self::get_styled_email_html( $subject_2, nl2br( $body_2_raw ) );
+			if ( ! empty( $to_2 ) && is_email( $to_2 ) ) {
+				$subject_2 = self::parse_mail_tags( $subject_2_tmpl, $data, $form_id );
+				$body_2_raw = self::parse_mail_tags( $body_2_tmpl, $data, $form_id );
 
-			// Headers for Mail 2
-            // Use the "From" address defined in Mail 1 (usually the site admin)
-			$headers_2 = [ 'Content-Type: text/html; charset=UTF-8' ];
-			$headers_2[] = 'From: ' . $from_parsed; 
+				// BRANDING: Apply Styled Template to User Email
+				$body_2_styled = self::get_styled_email_html( $subject_2, nl2br( $body_2_raw ) );
 
-			// --- SEND MAIL 2 ---
-			wp_mail( $to_2, $subject_2, $body_2_styled, $headers_2 );
+				// Headers for Mail 2
+				// Use the "From" address defined in Mail 1 (usually the site admin)
+				$headers_2 = [ 'Content-Type: text/html; charset=UTF-8' ];
+				$headers_2[] = 'From: ' . $from_parsed; 
+
+				// --- SEND MAIL 2 ---
+				wp_mail( $to_2, $subject_2, $body_2_styled, $headers_2 );
+			}
 		}
+	}
+
+	/**
+	 * Send Admin Reply to User
+	 */
+	public static function send_reply( $submission_id, $message, $reply_by_user_id ) {
+		global $wpdb;
+		$submission_table = $wpdb->prefix . 'pwp_submissions';
+		$replies_table = $wpdb->prefix . 'pwp_submission_replies';
+
+		$submission = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $submission_table WHERE id = %d", $submission_id ) );
+		
+		if ( ! $submission ) {
+			return new WP_Error( 'not_found', 'Submission not found' );
+		}
+
+		$to_email = $submission->user_email;
+		if ( ! is_email( $to_email ) ) {
+			return new WP_Error( 'no_email', 'Submission has no valid email address' );
+		}
+
+		// 1. Send Email
+		$site_title = get_bloginfo( 'name' );
+		$subject = "Reply from $site_title regarding your submission";
+		$body_styled = self::get_styled_email_html( $subject, nl2br( $message ) );
+		
+		// From: Site Admin or specialized reply-to? Default to site admin/branding
+		$headers = [ 'Content-Type: text/html; charset=UTF-8' ];
+		// Ensure 'From' is set nicely
+		$headers[] = 'From: ' . $site_title . ' <' . get_option( 'admin_email' ) . '>';
+
+		$sent = wp_mail( $to_email, $subject, $body_styled, $headers );
+
+		if ( $sent ) {
+			// 2. Log Reply in DB
+			$wpdb->insert( $replies_table, [
+				'submission_id' => $submission_id,
+				'message'       => $message,
+				'sender'        => 'admin',
+				'created_by'    => $reply_by_user_id
+			] );
+
+			// 3. Update Status
+			$wpdb->update( $submission_table, [ 'status' => 'replied' ], [ 'id' => $submission_id ] );
+			
+			return true;
+		}
+
+		return new WP_Error( 'send_failed', 'Could not send email.' );
 	}
 
     public static function parse_mail_tags( $content, $data, $form_id ) {

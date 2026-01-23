@@ -104,30 +104,15 @@ class PWP_Admin_Dashboard {
 			check_admin_referer( 'reply_submission' );
 			$id = intval( $_POST['submission_id'] );
 			$message = wp_kses_post( $_POST['reply_message'] );
-			$to = sanitize_email( $_POST['reply_to'] );
+			$current_user_id = get_current_user_id();
 
-
-			// Send Email using PWP_Email_Manager for consistent HTML template
-			$subject = 'Re: Your Support Request'; // Could be dynamic
-			
-			// Wrap admin's reply message in professional HTML template
 			require_once PWP_FORMS_PATH . 'includes/class-email-manager.php';
-			$styled_html = PWP_Email_Manager::get_styled_email_html( 
-				$subject, 
-				nl2br( $message )  // Convert line breaks to <br> tags
-			);
 			
-			$headers = [ 'Content-Type: text/html; charset=UTF-8' ];
-			wp_mail( $to, $subject, $styled_html, $headers );
+			$result = PWP_Email_Manager::send_reply( $id, $message, $current_user_id );
 
-			// Update Status & Note
-			global $wpdb;
-			$table = $wpdb->prefix . 'pwp_submissions';
-			$wpdb->update( 
-				$table, 
-				[ 'status' => 'replied', 'admin_notes' => 'Replied on ' . current_time( 'mysql' ) ], 
-				[ 'id' => $id ] 
-			);
+			if ( is_wp_error( $result ) ) {
+				wp_die( $result->get_error_message() );
+			}
 
 			wp_redirect( admin_url( 'edit.php?post_type=pwp_form&page=pwp-form-submissions&action=view&id=' . $id . '&msg=replied' ) );
 			exit;
@@ -244,6 +229,49 @@ class PWP_Admin_Dashboard {
 									<?php endforeach; ?>
 								</div>
 							<?php endif; ?>
+						</div>
+					</div>
+
+					<!-- CONVERSATION HISTORY -->
+					<div class="postbox">
+						<div class="postbox-header"><h2 class="hndle">Conversation History</h2></div>
+						<div class="inside">
+							<?php
+							$replies_table = $wpdb->prefix . 'pwp_submission_replies';
+							// Check if table exists to avoid errors on fresh installs before db update
+							if ( $wpdb->get_var( "SHOW TABLES LIKE '$replies_table'" ) === $replies_table ) {
+								$replies = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $replies_table WHERE submission_id = %d ORDER BY created_at ASC", $id ) );
+								
+								if ( empty( $replies ) ) {
+									echo '<p class="description">No replies yet.</p>';
+								} else {
+									echo '<div class="pwp-conversation-log" style="max-height: 400px; overflow-y: auto; background: #f9f9f9; border: 1px solid #ddd; padding: 15px;">';
+									foreach ( $replies as $reply ) {
+										$is_admin = $reply->sender === 'admin';
+										$bg = $is_admin ? '#fff' : '#e5f6ff';
+										$align = $is_admin ? 'right' : 'left'; 
+										$border = $is_admin ? 'border-left: 4px solid #0073aa;' : 'border-left: 4px solid #46b450;';
+										$author = $is_admin ? 'Admin' : 'User'; 
+										$date = date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $reply->created_at ) );
+										
+										?>
+										<div class="pwp-reply-item" style="margin-bottom: 15px; padding: 10px; background: <?php echo $bg; ?>; <?php echo $border; ?> box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+											<div class="pwp-reply-meta" style="font-size: 11px; color: #666; margin-bottom: 5px; display: flex; justify-content: space-between;">
+												<strong><?php echo esc_html( $author ); ?></strong>
+												<span><?php echo esc_html( $date ); ?></span>
+											</div>
+											<div class="pwp-reply-body" style="font-size: 13px; line-height: 1.5;">
+												<?php echo nl2br( esc_html( $reply->message ) ); ?>
+											</div>
+										</div>
+										<?php
+									}
+									echo '</div>';
+								}
+							} else {
+								echo '<p class="description">Reply history table not found. Please reactivate plugin or update database.</p>';
+							}
+							?>
 						</div>
 					</div>
 

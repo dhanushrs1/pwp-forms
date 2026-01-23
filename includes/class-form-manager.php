@@ -12,6 +12,44 @@ class PWP_Form_Manager {
 		add_action( 'save_post', [ $this, 'save_meta_boxes' ] );
 		add_filter( 'manage_pwp_form_posts_columns', [ $this, 'add_shortcode_column' ] );
 		add_action( 'manage_pwp_form_posts_custom_column', [ $this, 'render_shortcode_column' ], 10, 2 );
+		
+		// --- NEW: Load Scripts for the Editor ---
+		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
+		
+		// Validation Notices
+		add_action( 'admin_notices', [ $this, 'render_admin_notices' ] );
+	}
+
+	public function render_admin_notices() {
+		global $post;
+		if ( ! $post ) return;
+		
+		$error = get_transient( 'pwp_form_error_' . $post->ID );
+		if ( $error ) {
+			?>
+			<div class="notice notice-warning is-dismissible">
+				<p><?php echo esc_html( $error ); ?></p>
+			</div>
+			<?php
+			delete_transient( 'pwp_form_error_' . $post->ID );
+		}
+	}
+
+	/**
+	 * Enqueue Scripts (Fixes the Buttons)
+	 */
+	public function enqueue_assets( $hook ) {
+		global $post;
+		
+		// Only load on the PWP Form Edit Screen
+		if ( $hook === 'post.php' || $hook === 'post-new.php' ) {
+			if ( 'pwp_form' === get_post_type( $post ) ) {
+				// Load the JS that handles the buttons
+				wp_enqueue_script( 'pwp-admin-js', plugin_dir_url( __DIR__ ) . 'public/js/pwp-admin-settings.js', [ 'jquery' ], '1.1.0', true );
+				// Load the CSS for the toolbar
+				wp_enqueue_style( 'pwp-admin-css', plugin_dir_url( __DIR__ ) . 'public/css/pwp-admin-settings.css', [], '1.1.0' );
+			}
+		}
 	}
 
 	/**
@@ -232,7 +270,7 @@ class PWP_Form_Manager {
 			</div>
 		</div>
 
-		<textarea id="pwp_form_html" name="pwp_form_html" rows="20" style="width:100%; font-family: 'Consolas', 'Monaco', monospace; font-size: 13px; line-height: 1.5; background:#282c34; color:#abb2bf; border:0; padding:15px; border-radius:0 0 4px 4px;" placeholder="<!-- Enter your HTML form fields here -->"><?php echo esc_textarea( $html ); ?></textarea>
+		<textarea id="pwp_form_html" name="pwp_form_html" rows="20" spellcheck="false" style="width:100%; font-family: 'Consolas', 'Monaco', monospace; font-size: 13px; line-height: 1.5; background:#282c34; color:#abb2bf; border:0; padding:15px; border-radius:0 0 4px 4px;" placeholder="<!-- Enter your HTML form fields here -->"><?php echo esc_textarea( $html ); ?></textarea>
 		
 		<?php
 		// DEVELOPER POLISH: Enqueue CodeMirror for Syntax Highlighting
@@ -253,7 +291,25 @@ class PWP_Form_Manager {
 					editorSettings.codemirror.tabSize = 2;
 					editorSettings.codemirror.mode = 'text/html';
 					
+					// --- DISABLE VALIDATION (Remove Red Error Marks) ---
+					editorSettings.codemirror.lint = false;
+					editorSettings.codemirror.gutters = ['CodeMirror-linenumbers'];
+					
 					var editor = wp.codeEditor.initialize('pwp_form_html', editorSettings);
+					
+					// --- FIX: Make Toolbar Buttons Work with CodeMirror ---
+					$(document).on('click', '.pwp-tag-btn', function(e) {
+						e.preventDefault();
+						var value = $(this).data('value');
+						
+						if (editor && editor.codemirror) {
+							// Insert at cursor position in CodeMirror
+							var doc = editor.codemirror.getDoc();
+							var cursor = doc.getCursor();
+							doc.replaceRange(value, cursor);
+							editor.codemirror.focus();
+						}
+					});
 				}
 			});
 			</script>

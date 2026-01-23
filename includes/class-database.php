@@ -31,11 +31,26 @@ class PWP_Database {
 			KEY form_id (form_id),
 			KEY user_id (user_id),
 			KEY user_email (user_email),
+			KEY user_email (user_email),
 			KEY status (status)
+		) $charset_collate;";
+
+		// NEW: Replies Table
+		$table_replies = $wpdb->prefix . 'pwp_submission_replies';
+		$sql_replies = "CREATE TABLE $table_replies (
+			id bigint(20) NOT NULL AUTO_INCREMENT,
+			submission_id bigint(20) NOT NULL,
+			message longtext NOT NULL,
+			sender enum('admin','user') NOT NULL DEFAULT 'admin',
+			created_by bigint(20) DEFAULT NULL,
+			created_at datetime DEFAULT CURRENT_TIMESTAMP,
+			PRIMARY KEY  (id),
+			KEY submission_id (submission_id)
 		) $charset_collate;";
 
 		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 		dbDelta( $sql );
+		dbDelta( $sql_replies );
 	}
 
 	/**
