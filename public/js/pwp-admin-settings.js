@@ -1,10 +1,28 @@
 jQuery(document).ready(function ($) {
     
-    // --- Variable Insertion Logic ---
-    $('.pwp-insert-var').on('click', function (e) {
+    // 1. Initialize WordPress Color Picker
+    // (This fixes the "wrong symbol" issue by using the WP standard picker)
+    if ($.fn.wpColorPicker) {
+        $('.pwp-color-field').wpColorPicker();
+    }
+
+    // 2. Variable Insertion Logic (For Email Templates & Form Builder)
+    // Works for buttons with class "pwp-insert-var" OR "pwp-tag-btn"
+    $(document).on('click', '.pwp-insert-var, .pwp-tag-btn', function (e) {
         e.preventDefault();
+        
+        // Get value and target
+        // For Form Builder, the value is in the 'onclick' data or data-value
+        // We standardized to data-value in the PHP update below.
         const value = $(this).data('value');
-        const targetId = $(this).data('target');
+        
+        // Determine Target: 
+        // If data-target exists, use it. Otherwise default to 'pwp_form_html' (Form Editor)
+        let targetId = $(this).data('target');
+        if (!targetId) {
+            targetId = 'pwp_form_html';
+        }
+
         const $textarea = $('#' + targetId);
 
         if ($textarea.length) {
@@ -12,12 +30,10 @@ jQuery(document).ready(function ($) {
             
             // Insert at Cursor Position
             if (document.selection) {
-                // IE support
                 domTextarea.focus();
                 const sel = document.selection.createRange();
                 sel.text = value;
             } else if (domTextarea.selectionStart || domTextarea.selectionStart == '0') {
-                // MOZILLA and others
                 const startPos = domTextarea.selectionStart;
                 const endPos = domTextarea.selectionEnd;
                 domTextarea.value = domTextarea.value.substring(0, startPos)
@@ -34,36 +50,36 @@ jQuery(document).ready(function ($) {
         }
     });
 
-    // --- Modal Preview Logic ---
+    // 3. Tab Switching Logic (Moved here for reliability)
+    $('.pwp-tab-item').click(function(){
+        var tab = $(this).data('tab');
+        $('.pwp-tab-item').removeClass('active');
+        $(this).addClass('active');
+        $('.pwp-tab-content').removeClass('active');
+        $('#pwp-tab-' + tab).addClass('active');
+    });
+
+    // --- Modal Preview Logic (Existing) ---
     const modal = $('#pwp-preview-modal');
     const closeBtn = $('.pwp-modal-close');
     const previewFrame = $('#pwp-email-preview-frame');
 
-    // Mock Data
+    // Mock Data for Preview
     const mockData = {
         '{body}': '<table style="width:100%; border-collapse:collapse;"><tr><td style="padding:10px; border-bottom:1px solid #eee;"><strong>Name</strong></td><td style="padding:10px; border-bottom:1px solid #eee;">John Doe</td></tr><tr><td style="padding:10px; border-bottom:1px solid #eee;"><strong>Email</strong></td><td style="padding:10px; border-bottom:1px solid #eee;">john@example.com</td></tr><tr><td style="padding:10px; border-bottom:1px solid #eee;"><strong>Message</strong></td><td style="padding:10px; border-bottom:1px solid #eee;">I love this plugin!</td></tr></table>',
         '{site_name}': 'My WordPress Site',
         '{form_title}': 'Contact Form',
-        '{logo}': '<img src="https://via.placeholder.com/150x50" alt="Logo">' // Default fallback
+        '{logo}': '<img src="https://via.placeholder.com/150x50" alt="Logo">' 
     };
 
-    function renderPreview(targetTextareaId) {
-        const content = $('#' + targetTextareaId).val();
+    function renderPreview() {
+        // Content source is usually the body field if available, or just use mock
+        // For global settings preview, we just show styles
+        const content = mockData['{body}'];
         
-        // 2. Fetch Styles & Logo
-        const logoUrl = $('input[name="pwp_email_logo"]').val();
-        if (logoUrl) {
-            mockData['{logo}'] = '<img src="' + logoUrl + '" alt="Logo" style="max-height: 50px;">';
-        }
-
-        // 3. Replacements
         let processedContent = content;
-        Object.keys(mockData).forEach(key => {
-            const regex = new RegExp(key, 'g');
-            processedContent = processedContent.replace(regex, mockData[key]);
-        });
 
-        // 4. Fetch Styles
+        // Fetch Styles
         const bg = $('input[name="pwp_email_bg_color"]').val();
         const container = $('input[name="pwp_email_container_bg"]').val();
         const text = $('input[name="pwp_email_text_color"]').val();
@@ -71,8 +87,11 @@ jQuery(document).ready(function ($) {
         const font = $('input[name="pwp_email_font_family"]').val();
         const size = $('input[name="pwp_email_font_size"]').val();
         const footer = $('textarea[name="pwp_email_footer"]').val();
+        const logoUrl = $('input[name="pwp_email_logo"]').val();
 
-        // 3. Build HTML
+        let logoHtml = '';
+        if(logoUrl) logoHtml = `<div style="text-align:center; padding-bottom:20px;"><img src="${logoUrl}" style="max-width:200px;"></div>`;
+
         const html = `
             <!DOCTYPE html>
             <html>
@@ -82,45 +101,41 @@ jQuery(document).ready(function ($) {
                     .email-wrapper { max-width: 600px; margin: 0 auto; background: ${container}; padding: 30px; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
                     p { font-size: ${size}px; line-height: 1.6; margin-bottom: 20px; }
                     a { color: ${accent}; text-decoration: none; }
-                    h1, h2, h3 { color: ${accent}; margin-top: 0; }
                     .footer { text-align: center; margin-top: 30px; font-size: 12px; color: #888; }
                 </style>
             </head>
             <body>
+                <table width="100%"><tr><td align="center">
+                ${logoHtml}
                 <div class="email-wrapper">
+                    <h1>Thanks for contacting us!</h1>
+                    <p>This is a preview of your email styling.</p>
                     ${processedContent}
                 </div>
-                <div class="footer">
-                    ${footer}
-                </div>
+                <div class="footer">${footer}</div>
+                </td></tr></table>
             </body>
             </html>
         `;
 
-        // 4. Inject
         const doc = previewFrame[0].contentWindow.document;
         doc.open();
         doc.write(html);
         doc.close();
     }
 
-    // Open Modal
     $('.pwp-preview-btn').on('click', function (e) {
         e.preventDefault();
-        const targetId = $(this).data('target');
-        
-        renderPreview(targetId);
+        renderPreview();
         modal.fadeIn(200);
-        $('body').css('overflow', 'hidden'); // Prevent background scrolling
+        $('body').css('overflow', 'hidden');
     });
 
-    // Close Modal
     closeBtn.on('click', function () {
         modal.fadeOut(200);
         $('body').css('overflow', 'auto');
     });
 
-    // Close on click outside
     $(window).on('click', function (e) {
         if ($(e.target).is(modal)) {
             modal.fadeOut(200);

@@ -199,13 +199,13 @@ class PWP_Form_Manager {
 				<div class="pwp-toolbar-group">
 					<div class="pwp-group-title">Text Inputs</div>
 					<div class="pwp-tags-list">
-						<button type="button" class="button pwp-tag-btn" onclick="pwpInsert('<div class=\'pwp-field\'>\n<label>Name</label>\n<input type=\'text\' name=\'your-name\' class=\'pwp-input\' required>\n</div>\n')"><span class="dashicons dashicons-admin-users"></span> Text</button>
-						<button type="button" class="button pwp-tag-btn" onclick="pwpInsert('<div class=\'pwp-field\'>\n<label>Email</label>\n<input type=\'email\' name=\'your-email\' class=\'pwp-input\' required>\n</div>\n')"><span class="dashicons dashicons-email"></span> Email</button>
-						<button type="button" class="button pwp-tag-btn" onclick="pwpInsert('<div class=\'pwp-field\'>\n<label>Phone</label>\n<input type=\'tel\' name=\'your-phone\' class=\'pwp-input\'>\n</div>\n')"><span class="dashicons dashicons-phone"></span> Tel</button>
-						<button type="button" class="button pwp-tag-btn" onclick="pwpInsert('<div class=\'pwp-field\'>\n<label>URL</label>\n<input type=\'url\' name=\'your-url\' class=\'pwp-input\'>\n</div>\n')"><span class="dashicons dashicons-admin-links"></span> URL</button>
-						<button type="button" class="button pwp-tag-btn" onclick="pwpInsert('<div class=\'pwp-field\'>\n<label>Number</label>\n<input type=\'number\' name=\'your-number\' class=\'pwp-input\'>\n</div>\n')"><span class="dashicons dashicons-calculator"></span> Num</button>
-						<button type="button" class="button pwp-tag-btn" onclick="pwpInsert('<div class=\'pwp-field\'>\n<label>Date</label>\n<input type=\'date\' name=\'your-date\' class=\'pwp-input\'>\n</div>\n')"><span class="dashicons dashicons-calendar-alt"></span> Date</button>
-						<button type="button" class="button pwp-tag-btn" onclick="pwpInsert('<div class=\'pwp-field\'>\n<label>Message</label>\n<textarea name=\'your-message\' class=\'pwp-textarea\' rows=\'4\'></textarea>\n</div>\n')"><span class="dashicons dashicons-text-page"></span> TextArea</button>
+						<button type="button" class="button pwp-tag-btn" data-value="<div class='pwp-field'>&#10;<label>Name</label>&#10;<input type='text' name='your-name' class='pwp-input' required>&#10;</div>&#10;"><span class="dashicons dashicons-admin-users"></span> Text</button>
+						<button type="button" class="button pwp-tag-btn" data-value="<div class='pwp-field'>&#10;<label>Email</label>&#10;<input type='email' name='your-email' class='pwp-input' required>&#10;</div>&#10;"><span class="dashicons dashicons-email"></span> Email</button>
+						<button type="button" class="button pwp-tag-btn" data-value="<div class='pwp-field'>&#10;<label>Phone</label>&#10;<input type='tel' name='your-phone' class='pwp-input'>&#10;</div>&#10;"><span class="dashicons dashicons-phone"></span> Tel</button>
+						<button type="button" class="button pwp-tag-btn" data-value="<div class='pwp-field'>&#10;<label>URL</label>&#10;<input type='url' name='your-url' class='pwp-input'>&#10;</div>&#10;"><span class="dashicons dashicons-admin-links"></span> URL</button>
+						<button type="button" class="button pwp-tag-btn" data-value="<div class='pwp-field'>&#10;<label>Number</label>&#10;<input type='number' name='your-number' class='pwp-input'>&#10;</div>&#10;"><span class="dashicons dashicons-calculator"></span> Num</button>
+						<button type="button" class="button pwp-tag-btn" data-value="<div class='pwp-field'>&#10;<label>Date</label>&#10;<input type='date' name='your-date' class='pwp-input'>&#10;</div>&#10;"><span class="dashicons dashicons-calendar-alt"></span> Date</button>
+						<button type="button" class="button pwp-tag-btn" data-value="<div class='pwp-field'>&#10;<label>Message</label>&#10;<textarea name='your-message' class='pwp-textarea' rows='4'></textarea>&#10;</div>&#10;"><span class="dashicons dashicons-text-page"></span> TextArea</button>
 					</div>
 				</div>
 
@@ -213,9 +213,9 @@ class PWP_Form_Manager {
 				<div class="pwp-toolbar-group">
 					<div class="pwp-group-title">Selection</div>
 					<div class="pwp-tags-list">
-						<button type="button" class="button pwp-tag-btn" onclick="pwpInsert('<div class=\'pwp-field\'>\n<label>Select</label>\n<select name=\'your-menu\' class=\'pwp-input\'>\n<option value=\'Option 1\'>Option 1</option>\n</select>\n</div>\n')"><span class="dashicons dashicons-arrow-down-alt2"></span> Dropdown</button>
-						<button type="button" class="button pwp-tag-btn" onclick="pwpInsert('<div class=\'pwp-field\'>\n<label class=\'pwp-checkbox\'><input type=\'checkbox\' name=\'your-cb\' value=\'1\'> Option 1</label>\n</div>\n')"><span class="dashicons dashicons-yes"></span> Checkbox</button>
-						<button type="button" class="button pwp-tag-btn" onclick="pwpInsert('<div class=\'pwp-field\'>\n<label class=\'pwp-radio\'><input type=\'radio\' name=\'your-radio\' value=\'1\'> Option 1</label>\n</div>\n')"><span class="dashicons dashicons-marker"></span> Radio</button>
+						<button type="button" class="button pwp-tag-btn" data-value="<div class='pwp-field'>&#10;<label>Select</label>&#10;<select name='your-menu' class='pwp-input'>&#10;<option value='Option 1'>Option 1</option>&#10;</select>&#10;</div>&#10;"><span class="dashicons dashicons-arrow-down-alt2"></span> Dropdown</button>
+						<button type="button" class="button pwp-tag-btn" data-value="<div class='pwp-field'>&#10;<label class='pwp-checkbox'><input type='checkbox' name='your-cb' value='1'> Option 1</label>&#10;</div>&#10;"><span class="dashicons dashicons-yes"></span> Checkbox</button>
+						<button type="button" class="button pwp-tag-btn" data-value="<div class='pwp-field'>&#10;<label class='pwp-radio'><input type='radio' name='your-radio' value='1'> Option 1</label>&#10;</div>&#10;"><span class="dashicons dashicons-marker"></span> Radio</button>
 					</div>
 				</div>
 
@@ -223,9 +223,9 @@ class PWP_Form_Manager {
 				<div class="pwp-toolbar-group">
 					<div class="pwp-group-title">Advanced</div>
 					<div class="pwp-tags-list">
-						<button type="button" class="button pwp-tag-btn" onclick="pwpInsert('<div class=\'pwp-field\'>\n<label>File</label>\n<input type=\'file\' name=\'your-file\' class=\'pwp-input\'>\n</div>\n')"><span class="dashicons dashicons-paperclip"></span> File</button>
-						<button type="button" class="button pwp-tag-btn" onclick="pwpInsert('<div class=\'pwp-field\'>\n<label class=\'pwp-acceptance\'><input type=\'checkbox\' name=\'your-consent\' value=\'1\'> I agree</label>\n</div>\n')"><span class="dashicons dashicons-thumbs-up"></span> Accept</button>
-						<button type="button" class="button pwp-tag-btn" onclick="pwpInsert('<input type=\'hidden\' name=\'your-hidden\' value=\'value\'>\n')"><span class="dashicons dashicons-hidden"></span> Hidden</button>
+						<button type="button" class="button pwp-tag-btn" data-value="<div class='pwp-field'>&#10;<label>File</label>&#10;<input type='file' name='your-file' class='pwp-input'>&#10;</div>&#10;"><span class="dashicons dashicons-paperclip"></span> File</button>
+						<button type="button" class="button pwp-tag-btn" data-value="<div class='pwp-field'>&#10;<label class='pwp-acceptance'><input type='checkbox' name='your-consent' value='1'> I agree</label>&#10;</div>&#10;"><span class="dashicons dashicons-thumbs-up"></span> Accept</button>
+						<button type="button" class="button pwp-tag-btn" data-value="<input type='hidden' name='your-hidden' value='value'>&#10;"><span class="dashicons dashicons-hidden"></span> Hidden</button>
 					</div>
 				</div>
 
@@ -359,22 +359,6 @@ class PWP_Form_Manager {
 				});
 			}
 		});
-
-		function pwpInsert(myValue) {
-			var myField = document.getElementById('pwp_form_html');
-			if (document.selection) {
-				myField.focus();
-				sel = document.selection.createRange();
-				sel.text = myValue;
-			} else if (myField.selectionStart || myField.selectionStart == '0') {
-				var startPos = myField.selectionStart;
-				var endPos = myField.selectionEnd;
-				myField.value = myField.value.substring(0, startPos) + myValue + myField.value.substring(endPos, myField.value.length);
-			} else {
-				myField.value += myValue;
-			}
-			myField.focus();
-		}
 		</script>
 		<?php	}
 
@@ -382,7 +366,7 @@ class PWP_Form_Manager {
 	 * Render Tab: Mail
 	 */
 	public function render_tab_mail( $post ) {
-		// --- MAIL 1 (Admin Notification) ---
+		// --- MAIL 1 (Admin) ---
 		$to = get_post_meta( $post->ID, '_pwp_mail_to', true ) ?: '[_site_admin_email]';
 		$from = get_post_meta( $post->ID, '_pwp_mail_from', true ) ?: '[_site_title] <wordpress@' . $_SERVER['HTTP_HOST'] . '>';
 		$subject = get_post_meta( $post->ID, '_pwp_mail_subject', true ) ?: '[_site_title] "[your-subject]"';
@@ -390,14 +374,14 @@ class PWP_Form_Manager {
 		$body = get_post_meta( $post->ID, '_pwp_mail_body', true ) ?: "From: [your-name] <[your-email]>\nSubject: [your-subject]\n\nMessage Body:\n[your-message]\n\n-- \nThis is a notification that a contact form was submitted on your website ([_site_title] [_site_url]).";
 		$attachments = get_post_meta( $post->ID, '_pwp_mail_attachments', true ) ?: '[your-file]';
 
-		// --- MAIL 2 (User Confirmation) ---
+		// --- MAIL 2 (User) ---
 		$mail_2_active = get_post_meta( $post->ID, '_pwp_mail_2_active', true );
 		$mail_2_to = get_post_meta( $post->ID, '_pwp_mail_2_to', true ) ?: '[your-email]';
 		$mail_2_subject = get_post_meta( $post->ID, '_pwp_mail_2_subject', true ) ?: '[_site_title] - Receipt';
-		$mail_2_body = get_post_meta( $post->ID, '_pwp_mail_2_body', true ) ?: "Hi [your-name],\n\nThank you for your message. We have received it and will get back to you shortly.\n\n--\n[_site_title]";
+		$mail_2_body = get_post_meta( $post->ID, '_pwp_mail_2_body', true ) ?: "Hi [your-name],\n\nThank you for your message.\n\n--\n[_site_title]";
+
 		?>
-		
-		<h3 class="pwp-section-title" style="margin-top:0; padding-bottom:10px; border-bottom:1px solid #ddd;">Mail 1 (Admin Notification)</h3>
+        <h3 class="pwp-section-title">Mail 1 (Admin Notification)</h3>
 		<div class="pwp-field-row">
 			<label>To</label>
 			<input type="text" name="pwp_mail_to" value="<?php echo esc_attr( $to ); ?>" class="large-text">
@@ -424,16 +408,16 @@ class PWP_Form_Manager {
 			<textarea name="pwp_mail_attachments" rows="2" class="large-text"><?php echo esc_textarea( $attachments ); ?></textarea>
 		</div>
 
-		<hr style="margin: 30px 0; border: 0; border-top: 1px solid #ddd;">
+        <hr style="margin: 30px 0; border: 0; border-top: 1px solid #ddd;">
 
 		<h3 class="pwp-section-title">
-			<label style="font-weight:600;">
-				<input type="checkbox" name="pwp_mail_2_active" value="1" <?php checked( $mail_2_active, '1' ); ?> onclick="jQuery('#pwp-mail-2-group').toggle();">
+			<label>
+				<input type="checkbox" name="pwp_mail_2_active" value="1" <?php checked( $mail_2_active, '1' ); ?>>
 				Use Mail 2 (User Confirmation)
 			</label>
 		</h3>
 		
-		<div id="pwp-mail-2-group" style="<?php echo ( $mail_2_active ) ? '' : 'display:none;'; ?> margin-left: 20px; border-left: 2px solid #2271b1; padding-left: 20px;">
+		<div id="pwp-mail-2-group" style="<?php echo ( $mail_2_active ) ? '' : 'display:none;'; ?> margin-left: 20px; border-left: 2px solid #ddd; padding-left: 20px;">
 			<div class="pwp-field-row">
 				<label>To</label>
 				<input type="text" name="pwp_mail_2_to" value="<?php echo esc_attr( $mail_2_to ); ?>" class="large-text">
@@ -447,6 +431,18 @@ class PWP_Form_Manager {
 				<textarea name="pwp_mail_2_body" rows="8" class="large-text"><?php echo esc_textarea( $mail_2_body ); ?></textarea>
 			</div>
 		</div>
+        
+        <script>
+        jQuery(document).ready(function($){
+            $('input[name="pwp_mail_2_active"]').change(function(){
+                if($(this).is(':checked')) {
+                    $('#pwp-mail-2-group').slideDown();
+                } else {
+                    $('#pwp-mail-2-group').slideUp();
+                }
+            });
+        });
+        </script>
 		<?php
 	}
 

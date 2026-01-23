@@ -198,19 +198,19 @@ class PWP_Settings {
 		<div style="display:flex; flex-wrap:wrap; gap:20px;">
 			<div>
 				<label>Background Color</label><br>
-				<input type="color" name="pwp_email_bg_color" value="<?php echo esc_attr( $bg_color ); ?>">
+				<input type="text" class="pwp-color-field" name="pwp_email_bg_color" value="<?php echo esc_attr( $bg_color ); ?>" data-default-color="#f4f4f4">
 			</div>
 			<div>
 				<label>Container BG</label><br>
-				<input type="color" name="pwp_email_container_bg" value="<?php echo esc_attr( $container_bg ); ?>">
+				<input type="text" class="pwp-color-field" name="pwp_email_container_bg" value="<?php echo esc_attr( $container_bg ); ?>" data-default-color="#ffffff">
 			</div>
 			<div>
 				<label>Text Color</label><br>
-				<input type="color" name="pwp_email_text_color" value="<?php echo esc_attr( $text_color ); ?>">
+				<input type="text" class="pwp-color-field" name="pwp_email_text_color" value="<?php echo esc_attr( $text_color ); ?>" data-default-color="#333333">
 			</div>
 			<div>
 				<label>Accent Color</label><br>
-				<input type="color" name="pwp_email_accent_color" value="<?php echo esc_attr( $accent_color ); ?>">
+				<input type="text" class="pwp-color-field" name="pwp_email_accent_color" value="<?php echo esc_attr( $accent_color ); ?>" data-default-color="#0073aa">
 			</div>
 		</div>
 		<div style="margin-top:10px; display:flex; gap:20px;">
@@ -329,9 +329,13 @@ class PWP_Settings {
 	public function render_page() {
 		$active_tab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'general';
 		
+		// --- ADDED: Enqueue WP Color Picker ---
+		wp_enqueue_style( 'wp-color-picker' );
+		wp_enqueue_script( 'wp-color-picker' );
+
 		// Enqueue Local Assets for Settings Page
-		wp_enqueue_style( 'pwp-admin-settings', plugins_url( '../public/css/pwp-admin-settings.css', __FILE__ ), [], '1.0.0' );
-		wp_enqueue_script( 'pwp-admin-settings', plugins_url( '../public/js/pwp-admin-settings.js', __FILE__ ), [], '1.0.0', true );
+		wp_enqueue_style( 'pwp-admin-settings', plugins_url( '../public/css/pwp-admin-settings.css', __FILE__ ), [], '1.0.1' );
+		wp_enqueue_script( 'pwp-admin-settings', plugins_url( '../public/js/pwp-admin-settings.js', __FILE__ ), [ 'jquery', 'wp-color-picker' ], '1.0.1', true );
 
 		?>
 		<div class="wrap">
